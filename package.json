@@ -7,7 +7,7 @@
   "dependencies": {
     "com.alephvault.unity.support": "0.0.1",
     "com.alephvault.unity.layout": "0.0.1",
-    "com.alephvault.unity.binary": "0.0.1",
+    "com.alephvault.unity.binary": "0.0.1"
   },
   "author": {
     "name": "Aleph Vault",
