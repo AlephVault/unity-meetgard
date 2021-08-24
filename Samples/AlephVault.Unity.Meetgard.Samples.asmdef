@@ -1,10 +1,8 @@
 {
-    "name": "AlephVault.Unity.Meetgard",
+    "name": "AlephVault.Unity.Meetgard.Samples",
     "rootNamespace": "",
     "references": [
-        "AlephVault.Unity.Binary.Runtime",
-        "AlephVault.Unity.Support.Runtime",
-        "AlephVault.Unity.Layout.Runtime"
+        "GUID:aa7fb4e1c71ef8c45b640fda65eb777b"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
