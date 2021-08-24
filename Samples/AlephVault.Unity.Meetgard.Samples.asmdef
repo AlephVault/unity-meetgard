@@ -2,7 +2,9 @@
     "name": "AlephVault.Unity.Meetgard.Samples",
     "rootNamespace": "",
     "references": [
-        "GUID:aa7fb4e1c71ef8c45b640fda65eb777b"
+        "GUID:aa7fb4e1c71ef8c45b640fda65eb777b",
+        "GUID:c7004f7d2caeb7f488e163a6b45f66cb",
+        "GUID:9fb1e86edc1bf4f46bfc867526bca155"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
