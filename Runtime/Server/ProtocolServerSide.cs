@@ -166,7 +166,7 @@ namespace AlephVault.Unity.Meetgard
             /// </summary>
             /// <typeparam name="T">The type of the message being sent</typeparam>
             /// <param name="message">The message (as it was registered) that this sender will send</param>
-            protected Func<ulong[], T, Dictionary<ulong, Task>> MakeBroadcaster<T>(string message) where T : ISerializable
+            protected Func<IEnumerable<ulong>, T, Dictionary<ulong, Task>> MakeBroadcaster<T>(string message) where T : ISerializable
             {
                 return server.MakeBroadcaster<T>(this, message);
             }
@@ -179,7 +179,7 @@ namespace AlephVault.Unity.Meetgard
             ///   not have any body. The message to send does not have any body.
             /// </summary>
             /// <param name="message">The message (as it was registered) that this sender will send</param>
-            protected Func<ulong[], Dictionary<ulong, Task>> MakeBroadcaster(string message)
+            protected Func<IEnumerable<ulong>, Dictionary<ulong, Task>> MakeBroadcaster(string message)
             {
                 return server.MakeBroadcaster(this, message);
             }
@@ -194,7 +194,7 @@ namespace AlephVault.Unity.Meetgard
             /// <typeparam name="T">The type of the message this sender will send</typeparam>
             /// <param name="message">The name of the message this sender will send</param>
             /// <returns>A function that takes the message to send, of the appropriate type, and sends it (asynchronously)</returns>
-            protected Func<ulong[], T, Dictionary<ulong, Task>> MakeBroadcaster<ProtocolType, T>(string message) where ProtocolType : IProtocolServerSide where T : ISerializable
+            protected Func<IEnumerable<ulong>, T, Dictionary<ulong, Task>> MakeBroadcaster<ProtocolType, T>(string message) where ProtocolType : IProtocolServerSide where T : ISerializable
             {
                 return server.MakeBroadcaster<ProtocolType, T>(message);
             }
@@ -312,7 +312,7 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="clientIds">The ids to send the same message - use null to specify ALL the available ids</param>
             /// <param name="content">The message content</param>
             /// <returns>The send tasks for each endpoint that was iterated</returns>
-            public Dictionary<ulong, Task> Broadcast<T>(string message, ulong[] clientIds, T content) where T : ISerializable
+            public Dictionary<ulong, Task> Broadcast<T>(string message, IEnumerable<ulong> clientIds, T content) where T : ISerializable
             {
                 return server.Broadcast(this, message, clientIds, content);
             }
@@ -326,7 +326,7 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="clientIds">The ids to send the same message - use null to specify ALL the available ids</param>
             /// <param name="content">The message content</param>
             /// <returns>The send tasks for each endpoint that was iterated</returns>
-            public Dictionary<ulong, Task> Broadcast<ProtocolType, T>(string message, ulong[] clientIds, T content)
+            public Dictionary<ulong, Task> Broadcast<ProtocolType, T>(string message, IEnumerable<ulong> clientIds, T content)
                 where ProtocolType : IProtocolServerSide
                 where T : ISerializable
             {

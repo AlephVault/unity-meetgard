@@ -304,7 +304,7 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="clientIds">The ids to send the same message - use null to specify ALL the available ids</param>
             /// <param name="content">The message content</param>
             /// <returns>The send tasks for each endpoint that was iterated</returns>
-            public Dictionary<ulong, Task> Broadcast<T>(IProtocolServerSide protocol, string message, ulong[] clientIds, T content) where T : ISerializable
+            public Dictionary<ulong, Task> Broadcast<T>(IProtocolServerSide protocol, string message, IEnumerable<ulong> clientIds, T content) where T : ISerializable
             {
                 if (protocol == null)
                 {
@@ -355,12 +355,12 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="message">The message (as it was registered) being sent</param>
             /// <param name="clientIds">The ids to send the same message - use null to specify ALL the available ids</param>
             /// <returns>The send tasks for each endpoint that was iterated</returns>
-            public Dictionary<ulong, Task> Broadcast(IProtocolServerSide protocol, string message, ulong[] clientIds)
+            public Dictionary<ulong, Task> Broadcast(IProtocolServerSide protocol, string message, IEnumerable<ulong> clientIds)
             {
                 return Broadcast(protocol, message, clientIds, new Nothing());
             }
 
-            private Dictionary<ulong, Task> DoBroadcast<T>(ushort protocolId, ushort messageTag, ulong[] clientIds, T content) where T : ISerializable
+            private Dictionary<ulong, Task> DoBroadcast<T>(ushort protocolId, ushort messageTag, IEnumerable<ulong> clientIds, T content) where T : ISerializable
             {
                 Dictionary<ulong, Task> endpointTasks = new Dictionary<ulong, Task>();
 
@@ -423,7 +423,7 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="clientIds">The ids to send the same message - use null to specify ALL the available ids</param>
             /// <param name="content">The message content</param>
             /// <returns>The send tasks for each endpoint that was iterated</returns>
-            public Dictionary<ulong, Task> Broadcast<ProtocolType, T>(string message, ulong[] clientIds, T content) where ProtocolType : IProtocolServerSide where T : ISerializable
+            public Dictionary<ulong, Task> Broadcast<ProtocolType, T>(string message, IEnumerable<ulong> clientIds, T content) where ProtocolType : IProtocolServerSide where T : ISerializable
             {
                 ProtocolType protocol = GetComponent<ProtocolType>();
                 if (protocol == null)
@@ -452,7 +452,7 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="message">The message (as it was registered) being sent</param>
             /// <param name="clientIds">The ids to send the same message - use null to specify ALL the available ids</param>
             /// <returns>The send tasks for each endpoint that was iterated</returns>
-            public Dictionary<ulong, Task> Broadcast<ProtocolType>(string message, ulong[] clientIds) where ProtocolType : IProtocolServerSide
+            public Dictionary<ulong, Task> Broadcast<ProtocolType>(string message, IEnumerable<ulong> clientIds) where ProtocolType : IProtocolServerSide
             {
                 return Broadcast<ProtocolType, Nothing>(message, clientIds, new Nothing());
             }
@@ -465,7 +465,7 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="protocol">The protocol for this message. It must be an already attached component</param>
             /// <param name="message">The name of the message this sender will send</param>
             /// <returns>A function that takes the list of clients and the message to send, of the appropriate type, and sends it (asynchronously)</returns>
-            public Func<ulong[], T, Dictionary<ulong, Task>> MakeBroadcaster<T>(IProtocolServerSide protocol, string message) where T : ISerializable
+            public Func<IEnumerable<ulong>, T, Dictionary<ulong, Task>> MakeBroadcaster<T>(IProtocolServerSide protocol, string message) where T : ISerializable
             {
                 if (protocol == null)
                 {
@@ -515,9 +515,9 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="protocol">The protocol for this message. It must be an already attached component</param>
             /// <param name="message">The name of the message this sender will send</param>
             /// <returns>A function that takes the list of clients and sends the message (asynchronously)</returns>
-            public Func<ulong[], Dictionary<ulong, Task>> MakeBroadcaster(IProtocolServerSide protocol, string message)
+            public Func<IEnumerable<ulong>, Dictionary<ulong, Task>> MakeBroadcaster(IProtocolServerSide protocol, string message)
             {
-                Func<ulong[], Nothing, Dictionary<ulong, Task>> broadcaster = MakeBroadcaster<Nothing>(protocol, message);
+                Func<IEnumerable<ulong>, Nothing, Dictionary<ulong, Task>> broadcaster = MakeBroadcaster<Nothing>(protocol, message);
                 return (clientIds) => broadcaster(clientIds, new Nothing());
             }
 
@@ -529,7 +529,7 @@ namespace AlephVault.Unity.Meetgard
             /// <typeparam name="T">The type of the message this sender will send</typeparam>
             /// <param name="message">The name of the message this sender will send</param>
             /// <returns>A function that takes the list of clients and the message to send, of the appropriate type, and sends it (asynchronously)</returns>
-            public Func<ulong[], T, Dictionary<ulong, Task>> MakeBroadcaster<ProtocolType, T>(string message) where ProtocolType : IProtocolServerSide where T : ISerializable
+            public Func<IEnumerable<ulong>, T, Dictionary<ulong, Task>> MakeBroadcaster<ProtocolType, T>(string message) where ProtocolType : IProtocolServerSide where T : ISerializable
             {
                 ProtocolType protocol = GetComponent<ProtocolType>();
                 if (protocol == null)
@@ -550,9 +550,9 @@ namespace AlephVault.Unity.Meetgard
             /// <typeparam name="ProtocolType">The protocol type for this message. One instance of it must be an already attached component</param>
             /// <param name="message">The name of the message this sender will send</param>
             /// <returns>A function that takes the list of clients, and sends the message (asynchronously)</returns>
-            public Func<ulong[], Dictionary<ulong, Task>> MakeBroadcaster<ProtocolType>(string message) where ProtocolType : IProtocolServerSide
+            public Func<IEnumerable<ulong>, Dictionary<ulong, Task>> MakeBroadcaster<ProtocolType>(string message) where ProtocolType : IProtocolServerSide
             {
-                Func<ulong[], Nothing, Dictionary<ulong, Task>> broadcaster = MakeBroadcaster<ProtocolType, Nothing>(message);
+                Func<IEnumerable<ulong>, Nothing, Dictionary<ulong, Task>> broadcaster = MakeBroadcaster<ProtocolType, Nothing>(message);
                 return (clientIds) => broadcaster(clientIds, new Nothing());
             }
 
