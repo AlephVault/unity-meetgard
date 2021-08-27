@@ -1,5 +1,4 @@
-﻿
-using AlephVault.Unity.Meetgard.Protocols;
+﻿using AlephVault.Unity.Meetgard.Protocols;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -55,7 +54,7 @@ namespace AlephVault.Unity.Meetgard
                     // This will be invoked after the client repied with MyVersion
                     // message. This means: after the handshake started in client
                     // (protocol-wise) side.
-                    await (OnZeroHandshakeStarted ?.Invoke() ?? Task.CompletedTask);
+                    await (OnZeroHandshakeStarted?.Invoke() ?? Task.CompletedTask);
                 });
                 AddIncomingMessageHandler("Timeout", async (proto) =>
                 {
@@ -72,7 +71,7 @@ namespace AlephVault.Unity.Meetgard
                     // in turn initialize on their own for this client and send
                     // their own messages. But it is available anyway.
                     Ready = true;
-                    await (OnVersionMatch ?.Invoke() ?? Task.CompletedTask);
+                    await (OnVersionMatch?.Invoke() ?? Task.CompletedTask);
                 });
                 AddIncomingMessageHandler("VersionMismatch", async (proto) =>
                 {
