@@ -17,13 +17,11 @@ namespace AlephVault.Unity.Meetgard.Samples
             [SerializeField]
             private KeyCode stopKey;
 
-            private ChatProtocolClientSide protocol;
             private NetworkServer server;
 
             // Start is called before the first frame update
             void Awake()
             {
-                protocol = GetComponent<ChatProtocolClientSide>();
                 server = GetComponent<NetworkServer>();
             }
 
