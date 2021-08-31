@@ -1,4 +1,4 @@
-using AlephVault.Unity.Meetgard.Server;
+using AlephVault.Unity.Meetgard.Authoring.Behaviours.Server;
 using AlephVault.Unity.Support.Utils;
 using System;
 using System.Collections.Generic;

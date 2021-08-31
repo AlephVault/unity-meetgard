@@ -1,6 +1,4 @@
-using AlephVault.Unity.Meetgard.Client;
-using System.Collections;
-using System.Collections.Generic;
+using AlephVault.Unity.Meetgard.Authoring.Behaviours.Client;
 using UnityEngine;
 
 namespace AlephVault.Unity.Meetgard.Samples

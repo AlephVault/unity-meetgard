@@ -1,7 +1,4 @@
 using AlephVault.Unity.Meetgard.Protocols;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace AlephVault.Unity.Meetgard.Samples
 {
