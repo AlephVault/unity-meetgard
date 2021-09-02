@@ -1,5 +1,6 @@
 using AlephVault.Unity.Binary;
 using AlephVault.Unity.Meetgard.Types;
+using AlephVault.Unity.Support.Types;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -25,11 +26,14 @@ namespace AlephVault.Unity.Meetgard
                     // The endpoint id for the host.
                     public const ulong HostEndpointId = 0;
 
-                    // The next id to use, when a new connection is spawned.
-                    // Please note: id=0 is reserved for a single network
-                    // endpoint of type NetworkHostEndpoint (i.e. the host
-                    // connection for non-dedicated games).
-                    private ulong nextEndpointId = 1;
+                    // The pool retrieves the next id to use, and also allows
+                    // removing ids that are not used anymore, and optimize
+                    // the memory for the allocated ids in order to get the
+                    // next id in an optimal way.
+                    private IdPool connectionIdPool = new IdPool();
+
+                    // A mutex to interact with the connectionIdPool.
+                    private SemaphoreSlim connectionIdPoolMutex = new SemaphoreSlim(1, 1);
 
                     // A mapping of the connections currently established. Each
                     // connection is mapped against a generated id for them.
@@ -44,23 +48,7 @@ namespace AlephVault.Unity.Meetgard
                     // then increments.
                     private ulong GetNextEndpointId()
                     {
-                        if (nextEndpointId < ulong.MaxValue)
-                        {
-                            return nextEndpointId++;
-                        }
-                        else
-                        {
-                            ulong testId = 1;
-                            while (true)
-                            {
-                                if (testId == ulong.MaxValue)
-                                {
-                                    throw new Types.Exception("Connections exhausted! The server is insanely and improbably full");
-                                }
-                                if (!endpointById.ContainsKey(testId)) return testId;
-                                testId++;
-                            }
-                        }
+                        return connectionIdPool.Next();
                     }
 
                     // Removes the host endpoint. It will emulate disconnection
@@ -91,6 +79,15 @@ namespace AlephVault.Unity.Meetgard
                         {
                             endpointById.TryRemove(nextId, out var endpoint);
                             endpointIds.TryRemove(endpoint, out var _);
+                            try
+                            {
+                                await connectionIdPoolMutex.WaitAsync();
+                                connectionIdPool.Release(nextId);
+                            }
+                            finally
+                            {
+                                connectionIdPoolMutex.Release();
+                            }
                             await TriggerOnDisconnected(nextId, e);
                         }, maxMessageSize, idleSleepTime);
                         endpointById.TryAdd(nextId, endpoint);
