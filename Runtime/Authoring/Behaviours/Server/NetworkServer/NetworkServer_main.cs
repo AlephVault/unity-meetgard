@@ -45,6 +45,12 @@ namespace AlephVault.Unity.Meetgard
                         SetupServerProtocols();
                     }
 
+                    private void OnDestroy()
+                    {
+                        if (IsListening) listener.Stop();
+                    }
+
+
                     /// <summary>
                     ///   Starts the server, if it is not already started, in all the
                     ///   available ip network interfaces.
