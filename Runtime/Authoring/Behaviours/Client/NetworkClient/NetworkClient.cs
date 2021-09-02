@@ -43,6 +43,13 @@ namespace AlephVault.Unity.Meetgard
                     /// </summary>
                     [SerializeField]
                     private ushort maxMessageSize = 1024;
+
+                    /// <summary>
+                    ///   Tells that this client will not be destroyed when a new scene
+                    ///   is loaded in normal mode.
+                    /// </summary>
+                    [SerializeField]
+                    private bool DontDestroy;
                 }
             }
         }
