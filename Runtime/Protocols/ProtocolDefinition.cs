@@ -113,6 +113,20 @@ namespace AlephVault.Unity.Meetgard
                 }
             }
 
+            // This function checks via reflection whether a given type:
+            // 1. Is not null.
+            // 2. Respects the setting: ISerializable, new().
+            // It explodes with an error otherwise.
+            private static void CheckValidType(Type type)
+            {
+                if (type == null) throw new ArgumentNullException("type");
+
+                if (!typeof(ISerializable).IsAssignableFrom(type) || (!type.IsValueType && type.GetConstructor(Type.EmptyTypes) == null))
+                {
+                    throw new ArgumentException("The given type does not implement ISerializable or does not have an empty-args constructor");
+                }
+            }
+
             /// <summary>
             ///   Implement this method with several calls
             ///   to <see cref="DefineServerMessage{T}(string)"/>
@@ -124,11 +138,23 @@ namespace AlephVault.Unity.Meetgard
             ///   Registers a client message using a particular
             ///   serializable type.
             /// </summary>
-            /// <typeparam name="T">The tpye of the message's content</typeparam>
+            /// <typeparam name="T">The type of the message's content</typeparam>
             /// <param name="messageKey">The message's key</param>
             protected void DefineClientMessage<T>(string messageKey) where T : ISerializable, new()
             {
-                DefineMessage<T>(messageKey, "client", registeredClientMessageTypeByName);
+                DefineMessage(messageKey, "client", registeredClientMessageTypeByName, typeof(T));
+            }
+
+            /// <summary>
+            ///   Registers a client message using a particular
+            ///   serializable type.
+            /// </summary>
+            /// <param name="messageKey">The message's key</param>
+            /// <param name="messageType">The type of the message's content</param>
+            protected void DefineClientMessage(string messageKey, Type messageType)
+            {
+                CheckValidType(messageType);
+                DefineMessage(messageKey, "client", registeredClientMessageTypeByName, messageType);
             }
 
             /// <summary>
@@ -150,7 +176,19 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="messageKey">The message's key</param>
             protected void DefineServerMessage<T>(string messageKey) where T : ISerializable, new()
             {
-                DefineMessage<T>(messageKey, "server", registeredServerMessageTypeByName);
+                DefineMessage(messageKey, "server", registeredServerMessageTypeByName, typeof(T));
+            }
+
+            /// <summary>
+            ///   Registers a server message using a particular
+            ///   serializable type.
+            /// </summary>
+            /// <param name="messageKey">The message's key</param>
+            /// <param name="messageType">The type of the message's content</param>
+            protected void DefineServerMessage(string messageKey, Type messageType)
+            {
+                CheckValidType(messageType);
+                DefineMessage(messageKey, "server", registeredServerMessageTypeByName, messageType);
             }
 
             /// <summary>
@@ -166,7 +204,7 @@ namespace AlephVault.Unity.Meetgard
 
             // Registers a message using a particular serializable
             // type, and a particular context.
-            private void DefineMessage<T>(string messageKey, string scope, SortedDictionary<string, Type> messages) where T : ISerializable, new()
+            private void DefineMessage(string messageKey, string scope, SortedDictionary<string, Type> messages, Type messageType)
             {
                 if (isDefined)
                 {
@@ -193,7 +231,7 @@ namespace AlephVault.Unity.Meetgard
                 {
                     throw new ArgumentException($"Message key already registered as a {scope} message: {messageKey}");
                 }
-                messages[messageKey] = typeof(T);
+                messages[messageKey] = messageType;
             }
 
             /// <summary>
