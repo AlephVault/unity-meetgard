@@ -46,13 +46,23 @@ namespace AlephVault.Unity.Meetgard
                         incomingMessageHandlers = new Func<ISerializable, Task>[definition.ServerMessagesCount()];
                         try
                         {
-                            SetIncomingMessageHandlers();
+                            Initialize();
                         }
                         catch (System.Exception)
                         {
                             Destroy(gameObject);
                             throw;
                         }
+                    }
+
+                    /// <summary>
+                    ///   Performs the initialization of the protocol server side.
+                    ///   By default, this only involves invoking the initialization
+                    ///   of the message handlers.
+                    /// </summary>
+                    protected virtual void Initialize()
+                    {
+                        SetIncomingMessageHandlers();
                     }
 
                     /// <summary>
