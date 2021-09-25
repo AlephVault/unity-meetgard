@@ -353,7 +353,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <param name="tasks">The dictionary clientId => (task?)</param>
                     protected async Task UntilBroadcastIsDone(Dictionary<ulong, Task> tasks)
                     {
-                        foreach (KeyValuePair<ulong, Task> pair in tasks)
+                        if (tasks != null) foreach (KeyValuePair<ulong, Task> pair in tasks)
                         {
                             await (pair.Value ?? Task.CompletedTask);
                         }
