@@ -39,6 +39,11 @@ namespace AlephVault.Unity.Meetgard
                     // to refer the current protocol.
                     private Func<ISerializable, Task>[] incomingMessageHandlers = null;
 
+                    /// <summary>
+                    ///   See <see cref="NetworkClient.MaxMessageSize"/>.
+                    /// </summary>
+                    protected ushort MaxSocketMessageSize => client.MaxMessageSize;
+
                     // Initializes the handlers, according to its definition.
                     protected void Awake()
                     {

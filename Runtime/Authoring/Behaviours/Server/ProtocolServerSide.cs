@@ -4,6 +4,7 @@ using AlephVault.Unity.Meetgard.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -37,6 +38,11 @@ namespace AlephVault.Unity.Meetgard
                     // The handlers for this protocol. The action is already wrapped
                     // to refer the current protocol.
                     private Func<ulong, ISerializable, Task>[] incomingMessageHandlers = null;
+
+                    /// <summary>
+                    ///   See <see cref="NetworkServer.MaxMessageSize"/>.
+                    /// </summary>
+                    protected ushort MaxSocketMessageSize => server.MaxMessageSize;
 
                     // Initializes the handlers, according to its definition.
                     protected void Awake()
@@ -353,10 +359,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <param name="tasks">The dictionary clientId => (task?)</param>
                     protected async Task UntilBroadcastIsDone(Dictionary<ulong, Task> tasks)
                     {
-                        if (tasks != null) foreach (KeyValuePair<ulong, Task> pair in tasks)
-                        {
-                            await (pair.Value ?? Task.CompletedTask);
-                        }
+                        if (tasks != null) await Task.WhenAll(from task in tasks.Values select task ?? Task.CompletedTask) ;
                     }
 
                     /// <summary>
