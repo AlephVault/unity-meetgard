@@ -45,6 +45,11 @@ namespace AlephVault.Unity.Meetgard
                     private ushort maxMessageSize = 1024;
 
                     /// <summary>
+                    ///   See <see cref="maxMessageSize"/>.
+                    /// </summary>
+                    public ushort MaxMessageSize => maxMessageSize;
+
+                    /// <summary>
                     ///   Tells that this client will not be destroyed when a new scene
                     ///   is loaded in normal mode.
                     /// </summary>
