@@ -1,6 +1,7 @@
 using AlephVault.Unity.Binary;
 using AlephVault.Unity.Meetgard.Protocols;
 using AlephVault.Unity.Meetgard.Types;
+using AlephVault.Unity.Support.Utils;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,6 +32,10 @@ namespace AlephVault.Unity.Meetgard
                 {
                     // The related network client.
                     protected NetworkClient client;
+
+                    // A handler for when an error occurs while sending
+                    // a message (useful via send only).
+                    protected Func<System.Exception, Task> OnSendError;
 
                     // The protocol definition instance is created on construction.
                     private Definition definition = new Definition();
@@ -276,6 +281,17 @@ namespace AlephVault.Unity.Meetgard
                         where T : ISerializable
                     {
                         return client.Send<ProtocolType, T>(message, content);
+                    }
+
+                    /// <summary>
+                    ///   This task wraps another task (typically, a "send" one), awaiting to be done.
+                    ///   If the task is null, it will be ignored. Any error while awaiting will be
+                    ///   handled by the internal event <see cref="OnSendError"/>.
+                    /// </summary>
+                    /// <param name="task">The task (a possibly null one)</param>
+                    protected Task UntilSendIsDone(Task task)
+                    {
+                        return Tasks.UntilDone(task, OnSendError);
                     }
 
                     /// <summary>

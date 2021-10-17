@@ -86,7 +86,7 @@ namespace AlephVault.Unity.Meetgard
                     public override async Task OnConnected(ulong clientId)
                     {
                         readyConnections.Remove(clientId);
-                        await SendLetsAgree(clientId);
+                        await UntilSendIsDone(SendLetsAgree(clientId));
                         StartTimeout(clientId);
                     }
 
@@ -96,7 +96,7 @@ namespace AlephVault.Unity.Meetgard
                         await Task.Delay((int)(1000 * timeout));
                         if (!Ready(clientId))
                         {
-                            await SendTimeout(clientId);
+                            await UntilSendIsDone(SendTimeout(clientId));
                             server.Close(clientId);
                         }
                     }
@@ -115,17 +115,17 @@ namespace AlephVault.Unity.Meetgard
                         {
                             if (Ready(clientId))
                             {
-                                await SendAlreadyDone(clientId);
+                                await UntilSendIsDone(SendAlreadyDone(clientId));
                             }
                             else if (version.Equals(Version))
                             {
-                                await SendVersionMatch(clientId);
+                                await UntilSendIsDone(SendVersionMatch(clientId));
                                 readyConnections.Add(clientId);
                                 await OnReady(clientId);
                             }
                             else
                             {
-                                await SendVersionMismatch(clientId);
+                                await UntilSendIsDone(SendVersionMismatch(clientId));
                                 server.Close(clientId);
                             }
                         });

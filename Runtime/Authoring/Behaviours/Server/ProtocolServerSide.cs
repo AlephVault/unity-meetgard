@@ -1,6 +1,7 @@
 using AlephVault.Unity.Binary;
 using AlephVault.Unity.Meetgard.Protocols;
 using AlephVault.Unity.Meetgard.Types;
+using AlephVault.Unity.Support.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,6 +32,10 @@ namespace AlephVault.Unity.Meetgard
                 {
                     // The related network server.
                     protected NetworkServer server;
+
+                    // A handler for when an error occurs while sending
+                    // a message (useful via send or broadcast).
+                    protected Func<System.Exception, Task> OnSendError;
 
                     // The protocol definition instance is created on construction.
                     private Definition definition = new Definition();
@@ -355,11 +360,24 @@ namespace AlephVault.Unity.Meetgard
 
                     /// <summary>
                     ///   This task iterates over all of the broadcast tasks, awaiting to be done.
+                    ///   Null ones are omitted, and errors are handled one by one by the internal
+                    ///   event <see cref="OnSendError"/>.
                     /// </summary>
                     /// <param name="tasks">The dictionary clientId => (task?)</param>
-                    protected async Task UntilBroadcastIsDone(Dictionary<ulong, Task> tasks)
+                    protected Task UntilBroadcastIsDone(Dictionary<ulong, Task> tasks)
                     {
-                        if (tasks != null) await Task.WhenAll(from task in tasks.Values select task ?? Task.CompletedTask) ;
+                        return Tasks.UntilAllDone(tasks.Values, OnSendError);
+                    }
+
+                    /// <summary>
+                    ///   This task wraps another task (typically, a "send" one), awaiting to be done.
+                    ///   If the task is null, it will be ignored. Any error while awaiting will be
+                    ///   handled by the internal event <see cref="OnSendError"/>.
+                    /// </summary>
+                    /// <param name="task">The task (a possibly null one)</param>
+                    protected Task UntilSendIsDone(Task task)
+                    {
+                        return Tasks.UntilDone(task, OnSendError);
                     }
 
                     /// <summary>

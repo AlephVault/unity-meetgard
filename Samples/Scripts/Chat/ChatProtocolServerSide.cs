@@ -102,7 +102,7 @@ namespace AlephVault.Unity.Meetgard.Samples
 
             private async void TimeoutKick(ulong clientId)
             {
-                await SendPingTimeout(clientId);
+                await UntilSendIsDone(SendPingTimeout(clientId));
                 Debug.Log($"server :: client({clientId}) timed out");
                 server.Close(clientId);
             }
@@ -111,7 +111,7 @@ namespace AlephVault.Unity.Meetgard.Samples
             {
                 Connections.Add(clientId);
                 Debug.Log($"server :: client({clientId}) connected");
-                await SendWhoAreYou(clientId);
+                await UntilSendIsDone(SendWhoAreYou(clientId));
                 Debug.Log($"server :: server >>> WhoAreYou >>> client({clientId})");
             }
 
@@ -144,19 +144,19 @@ namespace AlephVault.Unity.Meetgard.Samples
                     Debug.Log($"server :: client({clientId}) >>> Nickname({nick}) >>> server");
                     if (Nicknames.ContainsKey(clientId))
                     {
-                        await SendNicknameAlreadyIntroduced(clientId);
+                        await UntilSendIsDone(SendNicknameAlreadyIntroduced(clientId));
                         Debug.Log($"server :: server >>> Nickname:AlreadyIntroduced >>> client({clientId})");
                     }
                     else if (Nicknames.ContainsValue(nick.Nick))
                     {
-                        await SendNicknameDuplicated(clientId);
+                        await UntilSendIsDone(SendNicknameDuplicated(clientId));
                         Debug.Log($"server :: server >>> Nickname:Duplicated >>> client({clientId})");
                         server.Close(clientId);
                     }
                     else
                     {
                         Nicknames.Add(clientId, nick.Nick);
-                        await SendNicknameOK(clientId);
+                        await UntilSendIsDone(SendNicknameOK(clientId));
                         Debug.Log($"server :: server >>> Nickname:OK >>> client({clientId})");
                         await UntilBroadcastIsDone(BroadcastJoined(null, nick));
                         Debug.Log($"server :: server >>> Nickname:Joined({nick}) >>> all");
@@ -167,14 +167,14 @@ namespace AlephVault.Unity.Meetgard.Samples
                     Debug.Log($"server :: client({clientId}) >>> Say({line}) >>> server");
                     if (Nicknames.TryGetValue(clientId, out string nick))
                     {
-                        await SendSayOK(clientId);
+                        await UntilSendIsDone(SendSayOK(clientId));
                         Debug.Log($"server :: server >>> Say:OK >>> client({clientId})");
                         await UntilBroadcastIsDone(BroadcastSaid(null, new Said() { Nickname = nick, Content = line.Content, When = DateTime.Now.ToString("F") }));
                         Debug.Log($"server :: server >>> Say:Said({nick}, {line.Content}) >>> all");
                     }
                     else
                     {
-                        await SendSayNotIntroduced(clientId);
+                        await UntilSendIsDone(SendSayNotIntroduced(clientId));
                         Debug.Log($"server :: server >>> Say:NotIntroduced >>> client({clientId})");
                     }
                 });

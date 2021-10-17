@@ -54,7 +54,7 @@ namespace AlephVault.Unity.Meetgard
                     {
                         AddIncomingMessageHandler("LetsAgree", async (proto) =>
                         {
-                            await SendMyVersion(Version);
+                            await UntilSendIsDone(SendMyVersion(Version));
                             // This will be invoked after the client repied with MyVersion
                             // message. This means: after the handshake started in client
                             // (protocol-wise) side.
