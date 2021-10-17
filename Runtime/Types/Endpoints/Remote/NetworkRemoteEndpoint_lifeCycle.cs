@@ -79,10 +79,19 @@ namespace AlephVault.Unity.Meetgard
                             }
                             if (stream.CanWrite && !queuedOutgoingMessages.IsEmpty)
                             {
-                                while (queuedOutgoingMessages.TryDequeue(out var result)) {
-                                    MessageUtils.WriteMessage(stream, result.Item1, result.Item2, result.Item3, outgoingMessageArray);
-                                    // The task is marked as complete.
-                                    result.Item4.TrySetResult(true);
+                                while (queuedOutgoingMessages.TryDequeue(out var result))
+                                {
+                                    try
+                                    {
+                                        MessageUtils.WriteMessage(stream, result.Item1, result.Item2, result.Item3, outgoingMessageArray);
+                                        // The task is marked as complete.
+                                        result.Item4.TrySetResult(true);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        result.Item4.TrySetException(e);
+                                        throw;
+                                    }
                                 }
                                 inactive = false;
                             }
