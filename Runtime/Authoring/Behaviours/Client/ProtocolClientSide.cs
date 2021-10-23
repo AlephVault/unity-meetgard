@@ -57,6 +57,7 @@ namespace AlephVault.Unity.Meetgard
                         try
                         {
                             Initialize();
+                            SetIncomingMessageHandlers();
                         }
                         catch (System.Exception)
                         {
@@ -67,13 +68,8 @@ namespace AlephVault.Unity.Meetgard
 
                     /// <summary>
                     ///   Performs the initialization of the protocol server side.
-                    ///   By default, this only involves invoking the initialization
-                    ///   of the message handlers.
                     /// </summary>
-                    protected virtual void Initialize()
-                    {
-                        SetIncomingMessageHandlers();
-                    }
+                    protected virtual void Initialize() {}
 
                     /// <summary>
                     ///   Implement this method with several calls to <see cref="AddIncomingMessageHandler{T}(string, Action{ProtocolClientSide{Definition}, T})"/>.
