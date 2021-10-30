@@ -49,7 +49,7 @@ namespace AlephVault.Unity.Meetgard
                     /// </summary>
                     public Func<ulong, Task> SendNotReady { get; private set; }
 
-                    protected void Start()
+                    protected override void Initialize()
                     {
                         SendLetsAgree = MakeSender("LetsAgree");
                         SendTimeout = MakeSender("Timeout");

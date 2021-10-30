@@ -16,7 +16,7 @@ namespace AlephVault.Unity.Meetgard.Samples
             private Func<Line, Task> SendLine;
             private Func<Echo, Task> SendPong;
 
-            protected void Start()
+            protected override void Initialize()
             {
                 SendNickname = MakeSender<Nickname>("Nickname");
                 SendLine = MakeSender<Line>("Say");

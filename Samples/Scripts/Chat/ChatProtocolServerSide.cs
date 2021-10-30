@@ -38,7 +38,7 @@ namespace AlephVault.Unity.Meetgard.Samples
             private Func<ulong, Task> SendPingTimeout;
             private Func<ulong[], Echo, Dictionary<ulong, Task>> BroadcastPing;
 
-            protected void Start()
+            protected override void Initialize()
             {
                 nicknameTimeout = Values.Clamp(1f, nicknameTimeout, 5f);
                 pingTimeout = Values.Clamp(10f, pingTimeout, 20f);
