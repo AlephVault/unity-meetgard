@@ -26,7 +26,9 @@ namespace AlephVault.Unity.Meetgard
                     // The current listener.
                     private TcpListener listener = null;
 
-                    // The related queue manager.
+                    /// <summary>
+                    ///   The related queue manager.
+                    /// </summary>
                     public AsyncQueueManager QueueManager;
 
                     /// <summary>

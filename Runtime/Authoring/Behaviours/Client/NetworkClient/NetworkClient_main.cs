@@ -23,7 +23,9 @@ namespace AlephVault.Unity.Meetgard
                     // is not established.
                     private NetworkRemoteEndpoint endpoint = null;
 
-                    // The related queue manager.
+                    /// <summary>
+                    ///   The related queue manager.
+                    /// </summary>
                     public AsyncQueueManager QueueManager { get; private set; }
 
                     /// <summary>

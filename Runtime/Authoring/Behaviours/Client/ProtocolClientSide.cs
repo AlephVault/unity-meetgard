@@ -1,6 +1,7 @@
 using AlephVault.Unity.Binary;
 using AlephVault.Unity.Meetgard.Protocols;
 using AlephVault.Unity.Meetgard.Types;
+using AlephVault.Unity.Support.Authoring.Behaviours;
 using AlephVault.Unity.Support.Utils;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,11 @@ namespace AlephVault.Unity.Meetgard
                 {
                     // The related network client.
                     protected NetworkClient client;
+
+                    /// <summary>
+                    ///   The related queue manager.
+                    /// </summary>
+                    public AsyncQueueManager QueueManager => client.QueueManager;
 
                     // A handler for when an error occurs while sending
                     // a message (useful via send only).
