@@ -12,6 +12,7 @@ namespace AlephVault.Unity.Meetgard
             {
                 using AlephVault.Unity.Binary;
                 using AlephVault.Unity.Meetgard.Types;
+                using AlephVault.Unity.Support.Authoring.Behaviours;
                 using System.Net;
                 using System.Net.Sockets;
                 using System.Threading.Tasks;
@@ -21,6 +22,9 @@ namespace AlephVault.Unity.Meetgard
                     // The underlying network endpoint, or null if the connection
                     // is not established.
                     private NetworkRemoteEndpoint endpoint = null;
+
+                    // The related queue manager.
+                    public AsyncQueueManager QueueManager { get; private set; }
 
                     /// <summary>
                     ///   Tells whether the endpoint is active or not. While Active, another
@@ -36,6 +40,7 @@ namespace AlephVault.Unity.Meetgard
 
                     private void Awake()
                     {
+                        QueueManager = GetComponent<AsyncQueueManager>();
                         maxMessageSize = Values.Clamp(512, maxMessageSize, 6144);
                         idleSleepTime = Values.Clamp(0.005f, idleSleepTime, 0.5f);
                         if (DontDestroy) DontDestroyOnLoad(gameObject);

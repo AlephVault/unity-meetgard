@@ -91,19 +91,22 @@ namespace AlephVault.Unity.Meetgard
 
                     // Handles a received message. The received message will be
                     // handled by the underlying protocol handler.
-                    private async Task HandleMessage(ushort protocolId, ushort messageTag, ISerializable message)
+                    private Task HandleMessage(ushort protocolId, ushort messageTag, ISerializable message)
                     {
-                        // At this point, the protocolId exists. Also, the messageTag exists.
-                        // We get the client-side handler, and we invoke it.
-                        Func<ISerializable, Task> handler = protocols[protocolId].GetIncomingMessageHandler(messageTag);
-                        if (handler != null)
+                        return QueueManager.QueueTask(async () =>
                         {
-                            await handler(message);
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"Message ({protocolId}, {messageTag}) does not have any handler!");
-                        }
+                            // At this point, the protocolId exists. Also, the messageTag exists.
+                            // We get the client-side handler, and we invoke it.
+                            Func<ISerializable, Task> handler = protocols[protocolId].GetIncomingMessageHandler(messageTag);
+                            if (handler != null)
+                            {
+                                await handler(message);
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"Message ({protocolId}, {messageTag}) does not have any handler!");
+                            }
+                        });
                     }
 
                     // Enumerates all of the protocols in this connection.
@@ -131,42 +134,48 @@ namespace AlephVault.Unity.Meetgard
                     // This function gets invoked when the network client
                     // successfully connects to a server. It invokes all
                     // of the OnConnected handlers on each protocol.
-                    private async Task TriggerOnConnected()
+                    private Task TriggerOnConnected()
                     {
-                        foreach (IProtocolClientSide protocol in protocols)
+                        return QueueManager.QueueTask(async () =>
                         {
-                            try
+                            foreach (IProtocolClientSide protocol in protocols)
                             {
-                                await protocol.OnConnected();
+                                try
+                                {
+                                    await protocol.OnConnected();
+                                }
+                                catch (System.Exception e)
+                                {
+                                    Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
+                                                     "for this warning will not be available on deployed games");
+                                    Debug.LogException(e);
+                                }
                             }
-                            catch (System.Exception e)
-                            {
-                                Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                 "for this warning will not be available on deployed games");
-                                Debug.LogException(e);
-                            }
-                        }
+                        });
                     }
 
                     // This function gets invoked when the network client
                     // disconnects from a server, be it normally or not.
                     // It invokes all of the OnDisconnected handlers on
                     // each protocol.
-                    private async Task TriggerOnDisconnected(System.Exception reason)
+                    private Task TriggerOnDisconnected(System.Exception reason)
                     {
-                        foreach (IProtocolClientSide protocol in protocols)
+                        return QueueManager.QueueTask(async () =>
                         {
-                            try
+                            foreach (IProtocolClientSide protocol in protocols)
                             {
-                                await protocol.OnDisconnected(reason);
+                                try
+                                {
+                                    await protocol.OnDisconnected(reason);
+                                }
+                                catch (System.Exception e)
+                                {
+                                    Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
+                                                     "for this warning will not be available on deployed games");
+                                    Debug.LogException(e);
+                                }
                             }
-                            catch (System.Exception e)
-                            {
-                                Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                 "for this warning will not be available on deployed games");
-                                Debug.LogException(e);
-                            }
-                        }
+                        });
                     }
                 }
             }

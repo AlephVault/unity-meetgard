@@ -1,3 +1,4 @@
+using AlephVault.Unity.Support.Authoring.Behaviours;
 using UnityEngine;
 
 namespace AlephVault.Unity.Meetgard
@@ -16,6 +17,7 @@ namespace AlephVault.Unity.Meetgard
                 ///     instantiated in the same scene.
                 ///   </para>
                 /// </summary>
+                [RequireComponent(typeof(AsyncQueueManager))]
                 public partial class NetworkClient : MonoBehaviour
                 {
                     /// <summary>

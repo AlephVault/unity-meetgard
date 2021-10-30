@@ -97,27 +97,29 @@ namespace AlephVault.Unity.Meetgard
 
                     // Handles a received message. The received message will be
                     // handled by the underlying protocol handler.
-                    private async Task HandleMessage(ulong clientId, ushort protocolId, ushort messageTag, ISerializable message)
+                    private Task HandleMessage(ulong clientId, ushort protocolId, ushort messageTag, ISerializable message)
                     {
-                        ZeroProtocolServerSide zeroProtocol = (ZeroProtocolServerSide)protocols[0];
-                        if (protocolId != 0 && !zeroProtocol.Ready(clientId))
-                        {
-                            await zeroProtocol.SendNotReady(clientId);
-                            return;
-                        }
+                        return QueueManager.QueueTask(async () => {
+                            ZeroProtocolServerSide zeroProtocol = (ZeroProtocolServerSide)protocols[0];
+                            if (protocolId != 0 && !zeroProtocol.Ready(clientId))
+                            {
+                                await zeroProtocol.SendNotReady(clientId);
+                                return;
+                            }
 
-                        // At this point, the protocolId exists. Also, the messageTag exists.
-                        // Also, the client is ready to interact freely with the server. We
-                        // get the client-side handler, and we invoke it.
-                        Func<ulong, ISerializable, Task> handler = protocols[protocolId].GetIncomingMessageHandler(messageTag);
-                        if (handler != null)
-                        {
-                            await handler(clientId, message);
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"Message ({protocolId}, {messageTag}) does not have any handler!");
-                        }
+                            // At this point, the protocolId exists. Also, the messageTag exists.
+                            // Also, the client is ready to interact freely with the server. We
+                            // get the client-side handler, and we invoke it.
+                            Func<ulong, ISerializable, Task> handler = protocols[protocolId].GetIncomingMessageHandler(messageTag);
+                            if (handler != null)
+                            {
+                                await handler(clientId, message);
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"Message ({protocolId}, {messageTag}) does not have any handler!");
+                            }
+                        });
                     }
 
                     // Enumerates all of the protocols in this connection.
@@ -179,21 +181,23 @@ namespace AlephVault.Unity.Meetgard
                     // This function gets invoked when the network server
                     // started. It invokes all of the OnServerStarted
                     // handlers on each protocol.
-                    private async Task TriggerOnServerStarted()
+                    private Task TriggerOnServerStarted()
                     {
-                        foreach (IProtocolServerSide protocol in protocols)
-                        {
-                            try
+                        return QueueManager.QueueTask(async () => {
+                            foreach (IProtocolServerSide protocol in protocols)
                             {
-                                await protocol.OnServerStarted();
+                                try
+                                {
+                                    await protocol.OnServerStarted();
+                                }
+                                catch (System.Exception e)
+                                {
+                                    Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
+                                                     "for this warning will not be available on deployed games");
+                                    Debug.LogException(e);
+                                }
                             }
-                            catch (System.Exception e)
-                            {
-                                Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                 "for this warning will not be available on deployed games");
-                                Debug.LogException(e);
-                            }
-                        }
+                        });
                     }
 
                     // This function gets invoked when a network client
@@ -201,38 +205,46 @@ namespace AlephVault.Unity.Meetgard
                     // the OnConnected only in the Zero protocol. The
                     // zero protocol, at a different moment, will trigger
                     // the OnConnected method in the other protocols.
-                    private async Task TriggerOnConnected(ulong clientId)
+                    private Task TriggerOnConnected(ulong clientId)
                     {
-                        await protocols[0].OnConnected(clientId);
+                        return QueueManager.QueueTask(async () => {
+                            await protocols[0].OnConnected(clientId);
+                        });
                     }
 
                     // This function gets invoked when a network client
                     // disconnects from this server, be it normally or
                     // not. It invokes the OnDisconnected handler only
                     // in the zero protocol.
-                    private async Task TriggerOnDisconnected(ulong clientId, System.Exception reason)
+                    private Task TriggerOnDisconnected(ulong clientId, System.Exception reason)
                     {
-                        await protocols[0].OnDisconnected(clientId, reason);
+                        Debug.Log($"Queuing disconnection for client id: {clientId}");
+                        return QueueManager.QueueTask(async () => {
+                            Debug.Log($"Running disconnection for client id: {clientId}");
+                            await protocols[0].OnDisconnected(clientId, reason);
+                        });
                     }
 
                     // This function gets invoked when the network server
                     // stopped. It invokes all of the OnServerStopped
                     // handlers on each protocol.
-                    private async Task TriggerOnServerStopped(System.Exception reason)
+                    private Task TriggerOnServerStopped(System.Exception reason)
                     {
-                        foreach (IProtocolServerSide protocol in protocols)
-                        {
-                            try
+                        return QueueManager.QueueTask(async () => {
+                            foreach (IProtocolServerSide protocol in protocols)
                             {
-                                await protocol.OnServerStopped(reason);
+                                try
+                                {
+                                    await protocol.OnServerStopped(reason);
+                                }
+                                catch (System.Exception e)
+                                {
+                                    Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
+                                                     "for this warning will not be available on deployed games");
+                                    Debug.LogException(e);
+                                }
                             }
-                            catch (System.Exception e)
-                            {
-                                Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                 "for this warning will not be available on deployed games");
-                                Debug.LogException(e);
-                            }
-                        }
+                        });
                     }
                 }
             }

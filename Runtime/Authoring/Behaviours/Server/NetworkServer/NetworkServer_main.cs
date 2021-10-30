@@ -1,5 +1,6 @@
 using AlephVault.Unity.Binary;
 using AlephVault.Unity.Meetgard.Types;
+using AlephVault.Unity.Support.Authoring.Behaviours;
 using AlephVault.Unity.Support.Utils;
 using System;
 using System.Collections;
@@ -25,6 +26,9 @@ namespace AlephVault.Unity.Meetgard
                     // The current listener.
                     private TcpListener listener = null;
 
+                    // The related queue manager.
+                    public AsyncQueueManager QueueManager;
+
                     /// <summary>
                     ///   Tells whether the life-cycle is active or not. While Active, another
                     ///   life-cycle (e.g. a call to <see cref="Listen(int)"/> or
@@ -39,6 +43,7 @@ namespace AlephVault.Unity.Meetgard
 
                     private void Awake()
                     {
+                        QueueManager = GetComponent<AsyncQueueManager>();
                         maxMessageSize = Values.Clamp(512, maxMessageSize, 6144);
                         idleSleepTime = Values.Clamp(0.005f, idleSleepTime, 0.5f);
                         if (DontDestroy) DontDestroyOnLoad(gameObject);
