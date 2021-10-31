@@ -218,9 +218,7 @@ namespace AlephVault.Unity.Meetgard
                     // in the zero protocol.
                     private Task TriggerOnDisconnected(ulong clientId, System.Exception reason)
                     {
-                        Debug.Log($"Queuing disconnection for client id: {clientId}");
                         return QueueManager.QueueTask(async () => {
-                            Debug.Log($"Running disconnection for client id: {clientId}");
                             await protocols[0].OnDisconnected(clientId, reason);
                         });
                     }
