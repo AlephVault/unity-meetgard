@@ -365,6 +365,36 @@ namespace AlephVault.Unity.Meetgard
                     }
 
                     /// <summary>
+                    ///   Runs an action in the main unity thread.
+                    /// </summary>
+                    /// <param name="action">The action to run</param>
+                    /// <returns>A task to wait for</returns>
+                    public Task RunInMainThread(Action action)
+                    {
+                        return server.QueueManager.Queue(action);
+                    }
+
+                    /// <summary>
+                    ///   Runs an async action in the main unity thread.
+                    /// </summary>
+                    /// <param name="action">The action to run</param>
+                    /// <returns>A task to wait for</returns>
+                    public Task RunInMainThread(Func<Task> task)
+                    {
+                        return server.QueueManager.Queue(task);
+                    }
+
+                    /// <summary>
+                    ///   Runs a typed async action in the main unity thread.
+                    /// </summary>
+                    /// <param name="action">The typed action to run</param>
+                    /// <returns>A typed task to wait for</returns>
+                    public Task<T> RunInMainThread<T>(Func<Task<T>> task)
+                    {
+                        return server.QueueManager.Queue(task);
+                    }
+
+                    /// <summary>
                     ///   This task iterates over all of the broadcast tasks, awaiting to be done.
                     ///   Null ones are omitted, and errors are handled one by one by the internal
                     ///   event <see cref="OnSendError"/>.
