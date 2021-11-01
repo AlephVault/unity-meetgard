@@ -93,7 +93,6 @@ namespace AlephVault.Unity.Meetgard
                     // handled by the underlying protocol handler.
                     private async Task HandleMessage(ushort protocolId, ushort messageTag, ISerializable message)
                     {
-                        Debug.Log($"NetworkClient::HandleMessage::{protocolId}, {messageTag} - handling...");
                         // At this point, the protocolId exists. Also, the messageTag exists.
                         // We get the client-side handler, and we invoke it.
                         Func<ISerializable, Task> handler = protocols[protocolId].GetIncomingMessageHandler(messageTag);
@@ -105,7 +104,6 @@ namespace AlephVault.Unity.Meetgard
                         {
                             Debug.LogWarning($"Message ({protocolId}, {messageTag}) does not have any handler!");
                         }
-                        Debug.Log($"NetworkClient::HandleMessage::{protocolId}, {messageTag} - handled.");
                     }
 
                     // Enumerates all of the protocols in this connection.
@@ -135,7 +133,6 @@ namespace AlephVault.Unity.Meetgard
                     // of the OnConnected handlers on each protocol.
                     private async Task TriggerOnConnected()
                     {
-                        Debug.Log("NetworkClient::TriggerOnConnected::Just connected - handling...");
                         foreach (IProtocolClientSide protocol in protocols)
                         {
                             try
@@ -149,7 +146,6 @@ namespace AlephVault.Unity.Meetgard
                                 Debug.LogException(e);
                             }
                         }
-                        Debug.Log("NetworkClient::TriggerOnConnected::Just connected - handled.");
                     }
 
                     // This function gets invoked when the network client
@@ -158,7 +154,6 @@ namespace AlephVault.Unity.Meetgard
                     // each protocol.
                     private async Task TriggerOnDisconnected(System.Exception reason)
                     {
-                        Debug.Log("NetworkClient::TriggerOnDisconnected::Just disconnected - handling...");
                         foreach (IProtocolClientSide protocol in protocols)
                         {
                             try
@@ -172,7 +167,6 @@ namespace AlephVault.Unity.Meetgard
                                 Debug.LogException(e);
                             }
                         }
-                        Debug.Log("NetworkClient::TriggerOnDisconnected::Just disconnected - handled.");
                     }
                 }
             }
