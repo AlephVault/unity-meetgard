@@ -60,6 +60,14 @@ namespace AlephVault.Unity.Meetgard
                     {
                         server = GetComponent<NetworkServer>();
                         incomingMessageHandlers = new Func<ulong, ISerializable, Task>[definition.ClientMessagesCount()];
+                        Setup();
+                    }
+
+                    /// <summary>
+                    ///   An after-awake setup.
+                    /// </summary>
+                    protected virtual void Setup()
+                    {
                     }
 
                     private void Start()
@@ -84,7 +92,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <summary>
                     ///   Implement this method with several calls to <see cref="AddIncomingMessageHandler{T}(string, Action{ProtocolServerSide{Definition}, ulong, T})"/>.
                     /// </summary>
-                    protected abstract void SetIncomingMessageHandlers();
+                    protected virtual void SetIncomingMessageHandlers() {}
 
                     /// <summary>
                     ///   Adds a handler to a defined incoming message. The handler to
