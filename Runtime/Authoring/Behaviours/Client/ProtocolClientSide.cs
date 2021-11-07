@@ -60,6 +60,14 @@ namespace AlephVault.Unity.Meetgard
                     {
                         client = GetComponent<NetworkClient>();
                         incomingMessageHandlers = new Func<ISerializable, Task>[definition.ServerMessagesCount()];
+                        Setup();
+                    }
+
+                    /// <summary>
+                    ///   An after-awake setup.
+                    /// </summary>
+                    protected virtual void Setup()
+                    {
                     }
 
                     private void Start()
