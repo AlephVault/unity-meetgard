@@ -92,7 +92,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <summary>
                     ///   Implement this method with several calls to <see cref="AddIncomingMessageHandler{T}(string, Action{ProtocolClientSide{Definition}, T})"/>.
                     /// </summary>
-                    protected abstract void SetIncomingMessageHandlers();
+                    protected virtual void SetIncomingMessageHandlers() {}
 
                     /// <summary>
                     ///   Adds a handler to a defined incoming message. The handler to
