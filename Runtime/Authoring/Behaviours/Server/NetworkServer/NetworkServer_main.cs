@@ -29,7 +29,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <summary>
                     ///   The related queue manager.
                     /// </summary>
-                    public AsyncQueueManager QueueManager;
+                    public AsyncQueueManager QueueManager { get; private set; }
 
                     /// <summary>
                     ///   Tells whether the life-cycle is active or not. While Active, another
