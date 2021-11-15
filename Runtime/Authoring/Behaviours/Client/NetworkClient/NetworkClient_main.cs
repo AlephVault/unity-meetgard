@@ -45,6 +45,7 @@ namespace AlephVault.Unity.Meetgard
                         QueueManager = GetComponent<AsyncQueueManager>();
                         maxMessageSize = Values.Clamp(512, maxMessageSize, 6144);
                         idleSleepTime = Values.Clamp(0.005f, idleSleepTime, 0.5f);
+                        writeTimeout = Values.Max(15f, writeTimeout);
                         if (DontDestroy) DontDestroyOnLoad(gameObject);
                         SetupClientProtocols();
                     }
@@ -82,7 +83,7 @@ namespace AlephVault.Unity.Meetgard
                         client.Connect(address, port);
                         endpoint = new NetworkRemoteEndpoint(
                             client, NewMessageContainer, TriggerOnConnected, HandleMessage, TriggerOnDisconnected,
-                            maxMessageSize, idleSleepTime
+                            maxMessageSize, idleSleepTime, writeTimeout
                         );
                     }
 

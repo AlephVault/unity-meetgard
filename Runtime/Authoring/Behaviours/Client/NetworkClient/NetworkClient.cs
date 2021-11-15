@@ -52,6 +52,14 @@ namespace AlephVault.Unity.Meetgard
                     public ushort MaxMessageSize => maxMessageSize;
 
                     /// <summary>
+                    ///   The timeout, in seconds, to wait until a message is written
+                    ///   and sent through the network. The connection will be closed
+                    ///   after this timeout occurs.
+                    /// </summary>
+                    [SerializeField]
+                    private float writeTimeout = 15f;
+
+                    /// <summary>
                     ///   Tells that this client will not be destroyed when a new scene
                     ///   is loaded in normal mode.
                     /// </summary>

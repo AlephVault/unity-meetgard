@@ -37,6 +37,9 @@ namespace AlephVault.Unity.Meetgard
             // The socket, created in our life-cycle.
             private TcpClient remoteSocket = null;
 
+            // The write timeout.
+            private int remoteSocketWriteTimeout;
+
             // On each arriving message, this function will be invoked to get
             // the get an object of the appropriate type to deserialize the
             // message content into.
@@ -45,8 +48,9 @@ namespace AlephVault.Unity.Meetgard
             public NetworkRemoteEndpoint(
                 TcpClient endpointSocket, Func<ushort, ushort, ISerializable> protocolMessageFactory,
                 Func<Task> onConnected, Func<ushort, ushort, ISerializable, Task> onArrival, Func<System.Exception, Task> onDisconnected,
-                ushort maxMessageSize = 1024, float idleSleepTime = 0.01f
+                ushort maxMessageSize = 1024, float idleSleepTime = 0.01f, float writeTimeout = 15f
             ) {
+                remoteSocketWriteTimeout = (int)(writeTimeout * 1000);
                 if (endpointSocket == null || !endpointSocket.Connected || endpointSocketsInUse.Contains(endpointSocket))
                 {
                     // This, however, does not prevent or detect the socket being used in different places.

@@ -56,6 +56,7 @@ namespace AlephVault.Unity.Meetgard
                     TriggerOnConnectionStart();
                     // We get the stream once.
                     NetworkStream stream = remoteSocket.GetStream();
+                    stream.WriteTimeout = remoteSocketWriteTimeout;
                     while (true)
                     {
                         try

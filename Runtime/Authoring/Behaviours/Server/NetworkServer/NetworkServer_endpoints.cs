@@ -89,7 +89,7 @@ namespace AlephVault.Unity.Meetgard
                                 connectionIdPoolMutex.Release();
                             }
                             await TriggerOnDisconnected(nextId, e);
-                        }, maxMessageSize, idleSleepTime);
+                        }, maxMessageSize, idleSleepTime, writeTimeout);
                         endpointById.TryAdd(nextId, endpoint);
                         endpointIds.TryAdd(endpoint, nextId);
                     }

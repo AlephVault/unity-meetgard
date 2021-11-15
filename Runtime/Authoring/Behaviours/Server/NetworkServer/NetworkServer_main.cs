@@ -48,6 +48,7 @@ namespace AlephVault.Unity.Meetgard
                         QueueManager = GetComponent<AsyncQueueManager>();
                         maxMessageSize = Values.Clamp(512, maxMessageSize, 6144);
                         idleSleepTime = Values.Clamp(0.005f, idleSleepTime, 0.5f);
+                        writeTimeout = Values.Max(15f, writeTimeout);
                         if (DontDestroy) DontDestroyOnLoad(gameObject);
                         SetupServerProtocols();
                     }
