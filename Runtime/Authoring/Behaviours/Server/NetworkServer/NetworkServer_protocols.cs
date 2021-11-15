@@ -147,6 +147,7 @@ namespace AlephVault.Unity.Meetgard
                                 IProtocolServerSide protocol = protocols[i];
                                 try
                                 {
+                                    Debug.Log($"NetworkServer::Client connection: {clientId}::{protocol.GetType().FullName}.OnConnected");
                                     await protocol.OnConnected(clientId);
                                 }
                                 catch (System.Exception e)

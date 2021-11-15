@@ -57,7 +57,7 @@ namespace AlephVault.Unity.Meetgard
                         {
                             Debug.Log("LetsAgree incoming");
                             Debug.Log("Sending version");
-                            await UntilSendIsDone(SendMyVersion(Version));
+                            _ = SendMyVersion(Version);
                             Debug.Log("TriggeringEvent");
                             // This will be invoked after the client repied with MyVersion
                             // message. This means: after the handshake started in client

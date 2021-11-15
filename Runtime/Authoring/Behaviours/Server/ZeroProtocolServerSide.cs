@@ -87,7 +87,7 @@ namespace AlephVault.Unity.Meetgard
                     {
                         readyConnections.Remove(clientId);
                         Debug.Log("ZeroProtocol::OnConnected::Sending zero-greeting...");
-                        await UntilSendIsDone(SendLetsAgree(clientId));
+                        _ = SendLetsAgree(clientId);
                         Debug.Log("ZeroProtocol::OnConnected::Zero-greeting sent.");
                         StartTimeout(clientId);
                     }
@@ -98,7 +98,7 @@ namespace AlephVault.Unity.Meetgard
                         await Task.Delay((int)(1000 * timeout));
                         if (!Ready(clientId))
                         {
-                            await UntilSendIsDone(SendTimeout(clientId));
+                            _ = SendTimeout(clientId);
                             server.Close(clientId);
                         }
                     }
@@ -119,13 +119,13 @@ namespace AlephVault.Unity.Meetgard
                             if (Ready(clientId))
                             {
                                 Debug.Log("Zero ProtocolServerSide::Sending AlreadyDone...");
-                                await UntilSendIsDone(SendAlreadyDone(clientId));
+                                _ = SendAlreadyDone(clientId);
                                 Debug.Log("Zero ProtocolServerSide::AlreadyDone sent.");
                             }
                             else if (version.Equals(Version))
                             {
                                 Debug.Log("Zero ProtocolServerSide::Sending Match...");
-                                await UntilSendIsDone(SendVersionMatch(clientId));
+                                _ = SendVersionMatch(clientId);
                                 readyConnections.Add(clientId);
                                 Debug.Log("Zero ProtocolServerSide::Triggering OnReady...");
                                 await OnReady(clientId);
@@ -134,7 +134,7 @@ namespace AlephVault.Unity.Meetgard
                             else
                             {
                                 Debug.Log("Zero ProtocolServerSide::Sending Mismatch...");
-                                await UntilSendIsDone(SendVersionMismatch(clientId));
+                                _ = SendVersionMismatch(clientId);
                                 Debug.Log("Zero ProtocolServerSide::Closing connection...");
                                 server.Close(clientId);
                                 Debug.Log("Zero ProtocolServerSide::Connection closed.");

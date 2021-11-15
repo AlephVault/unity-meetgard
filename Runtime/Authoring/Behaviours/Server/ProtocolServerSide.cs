@@ -414,17 +414,6 @@ namespace AlephVault.Unity.Meetgard
                     }
 
                     /// <summary>
-                    ///   This task wraps another task (typically, a "send" one), awaiting to be done.
-                    ///   If the task is null, it will be ignored. Any error while awaiting will be
-                    ///   handled by the internal event <see cref="OnSendError"/>.
-                    /// </summary>
-                    /// <param name="task">The task (a possibly null one)</param>
-                    protected Task UntilSendIsDone(Task task)
-                    {
-                        return Tasks.UntilDone(task, OnSendError);
-                    }
-
-                    /// <summary>
                     ///   <para>
                     ///     This is a callback that gets invoked when a client successfully
                     ///     established a connection to this server.

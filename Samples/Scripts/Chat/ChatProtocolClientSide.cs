@@ -28,7 +28,7 @@ namespace AlephVault.Unity.Meetgard.Samples
                 AddIncomingMessageHandler("WhoAreYou", async (proto) =>
                 {
                     Debug.Log($"client({Nickname}) :: server >>> WhoAreYou");
-                    await UntilSendIsDone(SendNickname(new Nickname() { Nick = Nickname }));
+                    _ = SendNickname(new Nickname() { Nick = Nickname });
                     Debug.Log($"client({Nickname}) :: me >>> Nickname {Nickname}");
                 });
                 AddIncomingMessageHandler<Said>("Say:Said", async (proto, content) =>
@@ -66,7 +66,7 @@ namespace AlephVault.Unity.Meetgard.Samples
                 AddIncomingMessageHandler<Echo>("Ping", async (proto, echo) =>
                 {
                     Debug.Log($"client({Nickname} :: server >>> Ping: {echo}");
-                    await UntilSendIsDone(SendPong(echo));
+                    _ = SendPong(echo);
                     Debug.Log($"client({Nickname}) :: me >>> Pong {echo}");
                 });
                 AddIncomingMessageHandler("Ping:Timeout", async (proto) =>
