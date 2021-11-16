@@ -1,5 +1,6 @@
 using AlephVault.Unity.Meetgard.Protocols;
 using AlephVault.Unity.Support.Utils;
+using AlephVault.Unity.Support.Authoring.Behaviours;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -101,7 +102,10 @@ namespace AlephVault.Unity.Meetgard
                                 {
                                     Debug.Log($"PingProtocolServerSide::Update()::Sending timeout to {pingTracking.ConnectionId}");
                                     SendTimeout(pingTracking.ConnectionId);
-                                    server.Close(pingTracking.ConnectionId);
+                                    // We have to be explicit here, or the extension mechanism
+                                    // will not recognize our overload of the Invoke function
+                                    // since an Invoke is already defined.
+                                    this.Invoke(() => { server.Close(pingTracking.ConnectionId); }, 0.5f);
                                 }
                             }
                         }
