@@ -14,11 +14,15 @@ namespace AlephVault.Unity.Meetgard
             namespace Client
             {
                 using AlephVault.Unity.Layout.Utils;
+                using AlephVault.Unity.Support.Utils;
 
                 public partial class NetworkClient : MonoBehaviour
                 {
                     // Protocols will exist by their id (0-based)
                     private IProtocolClientSide[] protocols = null;
+
+                    // Whether to debug or not using XDebug.
+                    private static bool debug = false;
 
                     // Returns an object to serve as the receiver of specific
                     // message data. This must be implemented with the protocol.
@@ -93,17 +97,21 @@ namespace AlephVault.Unity.Meetgard
                     // handled by the underlying protocol handler.
                     private async Task HandleMessage(ushort protocolId, ushort messageTag, ISerializable message)
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, "HandleMessage", debug);
+                        debugger.Start();
                         // At this point, the protocolId exists. Also, the messageTag exists.
                         // We get the client-side handler, and we invoke it.
                         Func<ISerializable, Task> handler = protocols[protocolId].GetIncomingMessageHandler(messageTag);
                         if (handler != null)
                         {
+                            debugger.Info($"Message ({protocolId}, {messageTag}) being handled");
                             await handler(message);
                         }
                         else
                         {
-                            Debug.LogWarning($"Message ({protocolId}, {messageTag}) does not have any handler!");
+                            debugger.Warning($"Message ({protocolId}, {messageTag}) does not have any handler!");
                         }
+                        debugger.End();
                     }
 
                     // Enumerates all of the protocols in this connection.
@@ -133,19 +141,21 @@ namespace AlephVault.Unity.Meetgard
                     // of the OnConnected handlers on each protocol.
                     private async Task TriggerOnConnected()
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, $"TriggerOnConnected()", debug);
+                        debugger.Start();
                         foreach (IProtocolClientSide protocol in protocols)
                         {
                             try
                             {
+                                debugger.Info($"{protocol.GetType().FullName}.OnConnected (migth be async)");
                                 await protocol.OnConnected();
                             }
                             catch (System.Exception e)
                             {
-                                Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                 "for this warning will not be available on deployed games");
-                                Debug.LogException(e);
+                                debugger.Exception(e);
                             }
                         }
+                        debugger.End();
                     }
 
                     // This function gets invoked when the network client
@@ -154,19 +164,21 @@ namespace AlephVault.Unity.Meetgard
                     // each protocol.
                     private async Task TriggerOnDisconnected(System.Exception reason)
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, $"TriggerOnDisconnected()", debug);
+                        debugger.Start();
                         foreach (IProtocolClientSide protocol in protocols)
                         {
                             try
                             {
+                                debugger.Info($"{protocol.GetType().FullName}.OnDisconnected (migth be async)");
                                 await protocol.OnDisconnected(reason);
                             }
                             catch (System.Exception e)
                             {
-                                Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                 "for this warning will not be available on deployed games");
-                                Debug.LogException(e);
+                                debugger.Exception(e);
                             }
                         }
+                        debugger.End();
                     }
                 }
             }

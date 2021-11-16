@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
+
 namespace AlephVault.Unity.Meetgard
 {
     namespace Authoring
@@ -20,11 +21,15 @@ namespace AlephVault.Unity.Meetgard
             namespace Server
             {
                 using AlephVault.Unity.Layout.Utils;
+                using AlephVault.Unity.Support.Utils;
 
                 public partial class NetworkServer : MonoBehaviour
                 {
                     // Protocols will exist by their id (0-based)
                     private IProtocolServerSide[] protocols = null;
+
+                    // Whether to debug or not using XDebug.
+                    private static bool debug = false;
 
                     // Returns an object to serve as the receiver of specific
                     // message data. This must be implemented with the protocol.
@@ -99,6 +104,8 @@ namespace AlephVault.Unity.Meetgard
                     // handled by the underlying protocol handler.
                     private async Task HandleMessage(ulong clientId, ushort protocolId, ushort messageTag, ISerializable message)
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, "HandleMessage", debug);
+                        debugger.Start();
                         ZeroProtocolServerSide zeroProtocol = (ZeroProtocolServerSide)protocols[0];
                         if (protocolId != 0 && !zeroProtocol.Ready(clientId))
                         {
@@ -112,12 +119,14 @@ namespace AlephVault.Unity.Meetgard
                         Func<ulong, ISerializable, Task> handler = protocols[protocolId].GetIncomingMessageHandler(messageTag);
                         if (handler != null)
                         {
+                            debugger.Info($"Message ({protocolId}, {messageTag}) being handled");
                             await handler(clientId, message);
                         }
                         else
                         {
-                            Debug.LogWarning($"Message ({protocolId}, {messageTag}) does not have any handler!");
+                            debugger.Warning($"Message ({protocolId}, {messageTag}) does not have any handler!");
                         }
+                        debugger.End();
                     }
 
                     // Enumerates all of the protocols in this connection.
@@ -142,38 +151,41 @@ namespace AlephVault.Unity.Meetgard
                         protocols = (from protocolServerSide in protocolList select (IProtocolServerSide)protocolServerSide).ToArray();
                         zeroProtocol.OnReady += async (clientId) =>
                         {
+                            XDebug debugger = new XDebug("Meetgard", this, $"ZeroProtocol.[Base OnReady]({clientId})", debug);
+                            debugger.Start();
                             for (int i = 1; i < protocols.Length; i++)
                             {
                                 IProtocolServerSide protocol = protocols[i];
                                 try
                                 {
-                                    Debug.Log($"NetworkServer::Client connection: {clientId}::{protocol.GetType().FullName}.OnConnected");
+                                    debugger.Info($"{protocol.GetType().FullName}.OnConnected (migth be async)");
                                     await protocol.OnConnected(clientId);
                                 }
                                 catch (System.Exception e)
                                 {
-                                    Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                     "for this warning will not be available on deployed games");
-                                    Debug.LogException(e);
+                                    debugger.Exception(e);
                                 }
                             }
+                            debugger.End();
                         };
                         zeroProtocol.OnReadyClosing += async (clientId, reason) =>
                         {
+                            XDebug debugger = new XDebug("Meetgard", this, $"ZeroProtocol.[Base OnReadyClosing]({clientId})", debug);
+                            debugger.Start();
                             for (int i = 1; i < protocols.Length; i++)
                             {
                                 IProtocolServerSide protocol = protocols[i];
                                 try
                                 {
+                                    debugger.Info($"{protocol.GetType().FullName}.OnDisonnected (might be async)");
                                     await protocol.OnDisconnected(clientId, reason);
                                 }
                                 catch (System.Exception e)
                                 {
-                                    Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                     "for this warning will not be available on deployed games");
-                                    Debug.LogException(e);
+                                    debugger.Exception(e);
                                 }
                             }
+                            debugger.End();
                         };
                     }
 
@@ -182,19 +194,21 @@ namespace AlephVault.Unity.Meetgard
                     // handlers on each protocol.
                     private async Task TriggerOnServerStarted()
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, $"TriggerOnServerStarted()", debug);
+                        debugger.Start();
                         foreach (IProtocolServerSide protocol in protocols)
                         {
                             try
                             {
+                                debugger.Info($"{protocol.GetType().FullName}.OnServerStarted (might be async)");
                                 await protocol.OnServerStarted();
                             }
                             catch (System.Exception e)
                             {
-                                Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                 "for this warning will not be available on deployed games");
-                                Debug.LogException(e);
+                                debugger.Exception(e);
                             }
                         }
+                        debugger.End();
                     }
 
                     // This function gets invoked when a network client
@@ -221,19 +235,21 @@ namespace AlephVault.Unity.Meetgard
                     // handlers on each protocol.
                     private async Task TriggerOnServerStopped(System.Exception reason)
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, $"TriggerOnServerStopped()", debug);
+                        debugger.Start();
                         foreach (IProtocolServerSide protocol in protocols)
                         {
                             try
                             {
+                                debugger.Info($"{protocol.GetType().FullName}.OnServerStopped (might be async)");
                                 await protocol.OnServerStopped(reason);
                             }
                             catch (System.Exception e)
                             {
-                                Debug.LogWarning("An exception was triggered. Ensure exceptions are captured and handled properly, " +
-                                                 "for this warning will not be available on deployed games");
-                                Debug.LogException(e);
+                                debugger.Exception(e);
                             }
                         }
+                        debugger.End();
                     }
                 }
             }
