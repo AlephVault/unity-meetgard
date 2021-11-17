@@ -24,7 +24,7 @@ namespace AlephVault.Unity.Meetgard
                 public partial class NetworkServer : MonoBehaviour
                 {
                     // Whether to debug or not using XDebug.
-                    private static bool debug = true;
+                    private static bool debug = false;
 
                     // The current listener.
                     private TcpListener listener = null;
