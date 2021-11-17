@@ -34,8 +34,9 @@ namespace AlephVault.Unity.Meetgard
                             // Accepts all of the incoming connections, ad eternum.
                             while (true) try
                             {
+                                TcpClient newClient = listener.AcceptTcpClient();
                                 connectionIdPoolMutex.Wait();
-                                AddNetworkClientEndpoint(listener.AcceptTcpClient());
+                                AddNetworkClientEndpoint(newClient);
                             }
                             finally
                             {

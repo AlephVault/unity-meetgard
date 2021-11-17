@@ -28,9 +28,6 @@ namespace AlephVault.Unity.Meetgard
                     // Protocols will exist by their id (0-based)
                     private IProtocolServerSide[] protocols = null;
 
-                    // Whether to debug or not using XDebug.
-                    private static bool debug = false;
-
                     // Returns an object to serve as the receiver of specific
                     // message data. This must be implemented with the protocol.
                     private ISerializable NewMessageContainer(ushort protocolId, ushort messageTag)
@@ -218,7 +215,10 @@ namespace AlephVault.Unity.Meetgard
                     // the OnConnected method in the other protocols.
                     private async Task TriggerOnConnected(ulong clientId)
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, $"TriggerOnConnected({clientId})", debug);
+                        debugger.Start();
                         await protocols[0].OnConnected(clientId);
+                        debugger.End();
                     }
 
                     // This function gets invoked when a network client
@@ -227,7 +227,10 @@ namespace AlephVault.Unity.Meetgard
                     // in the zero protocol.
                     private async Task TriggerOnDisconnected(ulong clientId, System.Exception reason)
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, $"TriggerOnDisconnected({clientId})", debug);
+                        debugger.Start();
                         await protocols[0].OnDisconnected(clientId, reason);
+                        debugger.End();
                     }
 
                     // This function gets invoked when the network server

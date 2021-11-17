@@ -2,8 +2,10 @@ using System;
 using UnityEngine;
 using AlephVault.Unity.Binary;
 using AlephVault.Unity.Meetgard.Types;
+using AlephVault.Unity.Support.Utils;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace AlephVault.Unity.Meetgard
 {
@@ -14,7 +16,6 @@ namespace AlephVault.Unity.Meetgard
             namespace Client
             {
                 using AlephVault.Unity.Layout.Utils;
-                using AlephVault.Unity.Support.Utils;
 
                 public partial class NetworkClient : MonoBehaviour
                 {

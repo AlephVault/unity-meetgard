@@ -1,6 +1,7 @@
 using AlephVault.Unity.Binary;
 using AlephVault.Unity.Meetgard.Types;
 using AlephVault.Unity.Support.Types;
+using AlephVault.Unity.Support.Utils;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -71,24 +72,40 @@ namespace AlephVault.Unity.Meetgard
                         ulong nextId = GetNextEndpointId();
                         NetworkEndpoint endpoint = new NetworkRemoteEndpoint(clientSocket, NewMessageContainer, async () =>
                         {
-                            await TriggerOnConnected(nextId);
+                            XDebug debugger = new XDebug("Meetgard", this, $"AddNetworkClientEndpoint::OnConnected({nextId})", debug);
+                            debugger.Start();
+                            try
+                            {
+                                await TriggerOnConnected(nextId);
+                            }
+                            finally
+                            {
+                                debugger.End();
+                            }
                         }, async (protocolId, messageTag, content) =>
                         {
                             await HandleMessage(nextId, protocolId, messageTag, content);
                         }, async (e) =>
                         {
+                            XDebug debugger = new XDebug("Meetgard", this, $"AddNetworkClientEndpoint::OnDisconnected({nextId})", debug);
+                            debugger.Start();
                             endpointById.TryRemove(nextId, out var endpoint);
                             endpointIds.TryRemove(endpoint, out var _);
                             try
                             {
+                                debugger.Info("Acquiring ID Mutex");
                                 await connectionIdPoolMutex.WaitAsync();
+                                debugger.Info($"Releasing ID {nextId}");
                                 connectionIdPool.Release(nextId);
+                                debugger.Info("Triggering OnConnected");
+                                await TriggerOnDisconnected(nextId, e);
                             }
                             finally
                             {
+                                debugger.Info("Releasing ID Mutex");
                                 connectionIdPoolMutex.Release();
+                                debugger.End();
                             }
-                            await TriggerOnDisconnected(nextId, e);
                         }, maxMessageSize, idleSleepTime, writeTimeout);
                         endpointById.TryAdd(nextId, endpoint);
                         endpointIds.TryAdd(endpoint, nextId);
