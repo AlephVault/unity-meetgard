@@ -384,6 +384,8 @@ namespace AlephVault.Unity.Meetgard
 
                     private Dictionary<ulong, Task> DoBroadcast<T>(ushort protocolId, ushort messageTag, IEnumerable<ulong> clientIds, T content) where T : ISerializable
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, "DoBroadcast(...)", debug);
+                        debugger.Start();
                         Dictionary<ulong, Task> endpointTasks = new Dictionary<ulong, Task>();
 
                         if (clientIds != null)
@@ -395,10 +397,13 @@ namespace AlephVault.Unity.Meetgard
                                 {
                                     try
                                     {
+                                        debugger.Info($"Sending message to connection id: {clientId}");
                                         endpointTasks?.Add(clientId, endpoint.Send(protocolId, messageTag, content));
+                                        debugger.Info("Success");
                                     }
-                                    catch
+                                    catch(System.Exception e)
                                     {
+                                        debugger.Exception(e);
                                         endpointTasks?.Add(clientId, null);
                                     }
                                 }
@@ -415,15 +420,19 @@ namespace AlephVault.Unity.Meetgard
                             {
                                 try
                                 {
+                                    debugger.Info($"Sending message to connection id: {pair.Key}");
                                     endpointTasks?.Add(pair.Key, pair.Value.Send(protocolId, messageTag, content));
+                                    debugger.Info("Success");
                                 }
-                                catch
+                                catch(System.Exception e)
                                 {
+                                    debugger.Exception(e);
                                     endpointTasks?.Add(pair.Key, null);
                                 }
                             }
                         }
 
+                        debugger.End();
                         return endpointTasks;
                     }
 
@@ -489,6 +498,9 @@ namespace AlephVault.Unity.Meetgard
                     /// <returns>A function that takes the list of clients and the message to send, of the appropriate type, and sends it (asynchronously)</returns>
                     public Func<IEnumerable<ulong>, T, Dictionary<ulong, Task>> MakeBroadcaster<T>(IProtocolServerSide protocol, string message) where T : ISerializable
                     {
+                        XDebug debugger = new XDebug("Meetgard", this, $"MakeBroadcaster<{typeof(T).FullName}>()", debug);
+                        debugger.Start();
+
                         if (protocol == null)
                         {
                             throw new ArgumentNullException("protocol");
@@ -512,9 +524,14 @@ namespace AlephVault.Unity.Meetgard
                         {
                             throw new OutgoingMessageTypeMismatchException($"Message sender creation for protocol / message ({protocol.GetType().FullName}, {message}) was attempted with type {typeof(T).FullName} when {expectedType.FullName} was expected");
                         }
+                        debugger.End();
 
                         return (clientIds, content) =>
                         {
+                            XDebug debugger = new XDebug("Meetgard", this, "MakeBroadcaster::Inner", debug);
+                            debugger.Start();
+
+                            debugger.Info("Checking parameters and status");
                             if (!IsRunning)
                             {
                                 throw new InvalidOperationException("The endpoint is not running - No data can be sent");
@@ -525,7 +542,10 @@ namespace AlephVault.Unity.Meetgard
                                 throw new OutgoingMessageTypeMismatchException($"Outgoing message ({protocol.GetType().FullName}, {message}) was attempted with type {content.GetType().FullName} when {expectedType.FullName} was expected");
                             }
 
-                            return DoBroadcast(protocolId, messageTag, clientIds, content);
+                            debugger.Info("Doing the actual broadcast");
+                            Dictionary<ulong, Task> result = DoBroadcast(protocolId, messageTag, clientIds, content);
+                            debugger.End();
+                            return result;
                         };
                     }
 

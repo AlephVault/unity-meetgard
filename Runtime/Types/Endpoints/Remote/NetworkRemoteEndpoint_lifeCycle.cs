@@ -7,6 +7,7 @@ namespace AlephVault.Unity.Meetgard
     namespace Types
     {
         using AlephVault.Unity.Binary;
+        using AlephVault.Unity.Support.Utils;
 
         /// <summary>
         ///   <para>
@@ -46,6 +47,9 @@ namespace AlephVault.Unity.Meetgard
             // The full socket lifecycle goes here.
             private void LifeCycle()
             {
+                XDebug debugger = new XDebug("Meetgard", this, "LifeCycle()", debug);
+                debugger.Start();
+
                 System.Exception lifeCycleException = null;
                 byte[] outgoingMessageArray = new byte[MaxMessageSize];
                 byte[] incomingMessageArray = new byte[MaxMessageSize];
@@ -74,6 +78,7 @@ namespace AlephVault.Unity.Meetgard
                                 // the message is not understood. Such exception will
                                 // blindly close the connection.
                                 result = MessageUtils.ReadMessage(stream, protocolMessageFactory, outgoingMessageArray);
+                                debugger.Info($"Receiving message: ({result.Item1.ProtocolId}, {result.Item1.MessageTag}, {result.Item2})");
                                 queuedIncomingMessages.Enqueue(new Tuple<ushort, ushort, ISerializable>(result.Item1.ProtocolId, result.Item1.MessageTag, result.Item2));
                                 TriggerOnMessageEvent();
                                 inactive = false;
@@ -82,14 +87,19 @@ namespace AlephVault.Unity.Meetgard
                             {
                                 while (queuedOutgoingMessages.TryDequeue(out var result))
                                 {
+                                    debugger.Info($"Taking queued message: {result}");
                                     try
                                     {
+                                        debugger.Info($"Writing it to the stream");
                                         MessageUtils.WriteMessage(stream, result.Item1, result.Item2, result.Item3, outgoingMessageArray);
                                         // The task is marked as complete.
+                                        debugger.Info($"Write success. Marking task as completed");
                                         result.Item4.TrySetResult(true);
+                                        debugger.Info($"Task marked");
                                     }
                                     catch (Exception e)
                                     {
+                                        debugger.Exception(e);
                                         result.Item4.TrySetException(e);
                                         throw;
                                     }
@@ -132,6 +142,7 @@ namespace AlephVault.Unity.Meetgard
                     lifeCycle = null;
                     // Finally, trigger the disconnected event.
                     TriggerOnConnectionEnd(lifeCycleException);
+                    debugger.End();
                 }
             }
         }

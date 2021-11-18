@@ -33,6 +33,9 @@ namespace AlephVault.Unity.Meetgard
         /// </summary>
         public abstract class NetworkEndpoint
         {
+            // Whether to debug or not using XDebug.
+            private bool debug = false;
+
             /// <summary>
             ///   Tells whether the endpoint is active (i.e.
             ///   running some sort of life-cycle).
@@ -60,6 +63,10 @@ namespace AlephVault.Unity.Meetgard
             /// <param name="data">The object to serialize and send</param>
             public Task Send(ushort protocolId, ushort messageTag, ISerializable data)
             {
+                XDebug debugger = new XDebug("Meetgard", this, "Send(...)", debug);
+                debugger.Start();
+
+                debugger.Info("Checking parameters and status");
                 if (!IsConnected)
                 {
                     throw new InvalidOperationException("The socket is not connected - No data can be sent");
@@ -70,7 +77,10 @@ namespace AlephVault.Unity.Meetgard
                     throw new ArgumentNullException("data");
                 }
 
-                return DoSend(protocolId, messageTag, data);
+                debugger.Info($"Doing the actual send (data: {data})");
+                Task result = DoSend(protocolId, messageTag, data);
+                debugger.End();
+                return result;
             }
 
             /// <summary>

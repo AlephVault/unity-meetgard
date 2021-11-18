@@ -28,6 +28,9 @@ namespace AlephVault.Unity.Meetgard
         /// </summary>
         public partial class NetworkRemoteEndpoint : NetworkEndpoint
         {
+            // Whether to debug or not using XDebug.
+            private bool debug = false;
+
             // Keeps a track of all the sockets that were used to
             // instantiate an endpoint. This does not guarantee
             // preventing the same socket to be used in a different
@@ -134,9 +137,16 @@ namespace AlephVault.Unity.Meetgard
             /// <returns>The task that can be waited for: when the message is done</returns>
             protected override Task DoSend(ushort protocolId, ushort messageTag, ISerializable data)
             {
+                XDebug debugger = new XDebug("Meetgard", this, "DoSend(...)", debug);
+                debugger.Start();
+
                 TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+                debugger.Info($"Queuing the message to be sent in the endpoint lifecycle: ({protocolId}, {messageTag}, {data})");
                 queuedOutgoingMessages.Enqueue(new Tuple<ushort, ushort, ISerializable, TaskCompletionSource<bool>>(protocolId, messageTag, data, tcs));
-                return tcs.Task;
+                Task result = tcs.Task;
+
+                debugger.End();
+                return result;
             }
         }
     }
