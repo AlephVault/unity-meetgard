@@ -1,3 +1,5 @@
+using System.Net.Security;
+using System.Security.Authentication;
 using AlephVault.Unity.Support.Authoring.Behaviours;
 using UnityEngine;
 
@@ -65,6 +67,30 @@ namespace AlephVault.Unity.Meetgard
                     /// </summary>
                     [SerializeField]
                     private bool DontDestroy;
+                    
+                    /// <summary>
+                    ///   Tells whether the server uses a secure protocol (SSL, TLS).
+                    ///   This client will attempt connecting using SSL handshakes and
+                    ///   security for the whole connection lifecycle.
+                    /// </summary>
+                    [SerializeField]
+                    private bool Secure;
+                    
+                    // TODO Add a custom editor later. All the following properties will
+                    // TODO be hidden in the inspector if Secure == false.
+
+                    /// <summary>
+                    ///   The SSL/TLS protocol to use. By default, the system guesses
+                    ///   which one to use, appropriately.
+                    /// </summary>
+                    [SerializeField]
+                    private SslProtocols sslProtocols = SslProtocols.Default;
+
+                    /// <summary>
+                    ///   Checks whether the server certificate is revoked or not.
+                    /// </summary>
+                    [SerializeField]
+                    private bool checkCertificateRevocation;
                 }
             }
         }
