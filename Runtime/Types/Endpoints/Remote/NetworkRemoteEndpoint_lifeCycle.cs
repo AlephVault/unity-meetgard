@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -59,7 +60,8 @@ namespace AlephVault.Unity.Meetgard
                     // So far, remoteSocket WILL be connected.
                     TriggerOnConnectionStart();
                     // We get the stream once.
-                    NetworkStream stream = remoteSocket.GetStream();
+                    NetworkStream networkStream = remoteSocket.GetStream();
+                    Stream stream = streamFactory(networkStream);
                     stream.WriteTimeout = remoteSocketWriteTimeout;
                     while (true)
                     {
@@ -71,7 +73,7 @@ namespace AlephVault.Unity.Meetgard
                                 // Close, if the socket is not connected.
                                 return;
                             }
-                            if (stream.CanRead && stream.DataAvailable)
+                            if (stream.CanRead && networkStream.DataAvailable)
                             {
                                 Tuple<MessageHeader, ISerializable> result;
                                 // protocolMessageFactory must throw an exception when

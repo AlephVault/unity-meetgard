@@ -40,6 +40,10 @@ namespace AlephVault.Unity.Meetgard
                     /// </summary>
                     public bool IsConnected { get { return endpoint != null && endpoint.IsConnected; } }
 
+                    // The target host this client is being connected against. Only available
+                    // while connected AND not using a bare IP.
+                    private string targetHostName = null;
+
                     private void Awake()
                     {
                         QueueManager = GetComponent<AsyncQueueManager>();
@@ -77,12 +81,25 @@ namespace AlephVault.Unity.Meetgard
                             throw new InvalidOperationException("The socket is already connected - It cannot be connected again");
                         }
 
+                        try
+                        {
+                            _ = IPAddress.Parse(address);
+                            if (secure) throw new InvalidOperationException("Cannot connect to a bare IP " +
+                                                                            "address since this client is set " +
+                                                                            "to use a secure connection");
+                            targetHostName = null;
+                        }
+                        catch (FormatException)
+                        {
+                            targetHostName = address;
+                        }
+                        
                         // Connects to a given address. Throws any exception
                         // that socket connection throws.
                         TcpClient client = new TcpClient();
                         client.Connect(address, port);
                         endpoint = new NetworkRemoteEndpoint(
-                            client, NewMessageContainer, TriggerOnConnected, HandleMessage, TriggerOnDisconnected,
+                            client, PrepareStream, NewMessageContainer, TriggerOnConnected, HandleMessage, TriggerOnDisconnected,
                             maxMessageSize, idleSleepTime, writeTimeout
                         );
                     }

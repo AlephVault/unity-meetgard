@@ -70,7 +70,7 @@ namespace AlephVault.Unity.Meetgard
                     private void AddNetworkClientEndpoint(TcpClient clientSocket)
                     {
                         ulong nextId = GetNextEndpointId();
-                        NetworkEndpoint endpoint = new NetworkRemoteEndpoint(clientSocket, NewMessageContainer, async () =>
+                        NetworkEndpoint endpoint = new NetworkRemoteEndpoint(clientSocket, PrepareStream, NewMessageContainer, async () =>
                         {
                             XDebug debugger = new XDebug("Meetgard", this, $"AddNetworkClientEndpoint::OnConnected({nextId})", debug);
                             debugger.Start();

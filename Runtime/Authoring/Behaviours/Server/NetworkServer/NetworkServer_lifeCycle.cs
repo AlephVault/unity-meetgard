@@ -31,6 +31,7 @@ namespace AlephVault.Unity.Meetgard
                         {
                             // The server is considered connected right now.
                             DoTriggerOnServerStarted();
+                            PrepareCertificate();
                             // Accepts all of the incoming connections, ad eternum.
                             while (true) try
                             {
@@ -52,6 +53,7 @@ namespace AlephVault.Unity.Meetgard
                         }
                         catch (System.Exception e)
                         {
+                            Debug.LogException(e);
                             lifeCycleException = e;
                         }
                         finally

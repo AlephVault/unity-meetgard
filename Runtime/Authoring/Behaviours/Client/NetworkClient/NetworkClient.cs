@@ -2,6 +2,7 @@ using System.Net.Security;
 using System.Security.Authentication;
 using AlephVault.Unity.Support.Authoring.Behaviours;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AlephVault.Unity.Meetgard
 {
@@ -74,7 +75,13 @@ namespace AlephVault.Unity.Meetgard
                     ///   security for the whole connection lifecycle.
                     /// </summary>
                     [SerializeField]
-                    private bool Secure;
+                    private bool secure;
+
+                    /// <summary>
+                    ///   Tells whether the client should always trust the server
+                    /// </summary>
+                    [SerializeField]
+                    private bool trustServerCertificate;
                     
                     // TODO Add a custom editor later. All the following properties will
                     // TODO be hidden in the inspector if Secure == false.
@@ -90,7 +97,7 @@ namespace AlephVault.Unity.Meetgard
                     ///   Checks whether the server certificate is revoked or not.
                     /// </summary>
                     [SerializeField]
-                    private bool checkCertificateRevocation;
+                    private bool checkCertificateRevocation = true;
                 }
             }
         }

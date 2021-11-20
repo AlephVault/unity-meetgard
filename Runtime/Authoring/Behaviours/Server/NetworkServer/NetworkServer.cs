@@ -1,6 +1,7 @@
 using System.Security.Authentication;
 using AlephVault.Unity.Support.Authoring.Behaviours;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace AlephVault.Unity.Meetgard
 {
@@ -74,7 +75,7 @@ namespace AlephVault.Unity.Meetgard
                     ///   for the whole connection lifecycle.
                     /// </summary>
                     [SerializeField]
-                    private bool Secure;
+                    private bool secure;
                     
                     // TODO Add a custom editor later. All the following properties will
                     // TODO be hidden in the inspector if Secure == false.
@@ -90,29 +91,18 @@ namespace AlephVault.Unity.Meetgard
                     ///   The path to the certificate to use. When using the secure
                     ///   mode, this field is mandatory. The file will be attempted
                     ///   as a .pfx file (containing both the certificate and the
-                    ///   private key) if the value of <see cref="privateKeyPath"/>
-                    ///   is empty. Otherwise, this filepath will be understood as
-                    ///   a .pem certificate file, and also the key will be attempted
-                    ///   as that format. Additionally, if there is a non-blank value
-                    ///   at <see cref="privateKeyPassphraseEnvVar"/>, then the key
-                    ///   will be attempted as an encrypted private key, regardless
-                    ///   the whole load being .pfx or .pem. Both the certificate
-                    ///   path and the private key path (if specified) must be either
-                    ///   absolute paths or somehow reachable paths from the server.
+                    ///   private key). Additionally, if there is a non-blank value
+                    ///   at <see cref="privateKeyPassphraseEnvVar"/>, then the file
+                    ///   will be attempted as an pfx file with encrypted private key.
+                    ///   The value for this field must be an absolute path to the
+                    ///   pfx file.
                     /// </summary>
                     [SerializeField]
                     private string certificatePath;
-                    
-                    /// <summary>
-                    ///   See <see cref="certificatePath"/> for details on how to use
-                    ///   this field.
-                    /// </summary>
-                    [SerializeField]
-                    private string privateKeyPath;
 
                     /// <summary>
-                    ///   See <see cref="certificatePath"/> for details on how to use
-                    ///   this field.
+                    ///   If not empty, this file contains the name of an environment
+                    ///   variable to get the certificate password from.
                     /// </summary>
                     [SerializeField]
                     private string privateKeyPassphraseEnvVar;
