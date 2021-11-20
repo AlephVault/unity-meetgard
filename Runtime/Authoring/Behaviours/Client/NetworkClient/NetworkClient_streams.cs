@@ -46,7 +46,7 @@ namespace AlephVault.Unity.Meetgard
 
                         SslStream newStream = new SslStream(
                             stream, true,
-                            new RemoteCertificateValidationCallback(ValidateServerCertificate), 
+                            ValidateServerCertificate, 
                             null
                         );
                         newStream.AuthenticateAsClient(

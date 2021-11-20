@@ -52,6 +52,16 @@ namespace AlephVault.Unity.Meetgard
 
                             certificate = new X509Certificate2(certificatePath, passphrase);
                         }
+
+                        Debug.Log($"Using certificate:\n{certificate}");
+                        if (!certificate.Verify())
+                        {
+                            Debug.LogWarning(
+                                $"The supplied certificate is not valid. Ensure this is only a " +
+                                  $"debug run you can deal with, and not a production run. A NetworkClient " +
+                                  $"will need to be set to trust this server for the connection to work"
+                            );
+                        }
                     }
                     
                     // Prepares a stream, using the current certificate if
@@ -63,7 +73,11 @@ namespace AlephVault.Unity.Meetgard
                             return stream;
                         }
 
-                        SslStream newStream = new SslStream(stream, true);
+                        SslStream newStream = new SslStream(
+                            stream, true, 
+                            (sender, x509Certificate, chain, errors) => true,
+                            null
+                        );
                         newStream.AuthenticateAsServer(certificate, false, sslProtocols, false);
                         return newStream;
                     }

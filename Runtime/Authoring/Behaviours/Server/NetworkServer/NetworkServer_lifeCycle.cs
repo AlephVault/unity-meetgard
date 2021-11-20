@@ -30,8 +30,8 @@ namespace AlephVault.Unity.Meetgard
                         try
                         {
                             // The server is considered connected right now.
-                            DoTriggerOnServerStarted();
                             PrepareCertificate();
+                            DoTriggerOnServerStarted();
                             // Accepts all of the incoming connections, ad eternum.
                             while (true) try
                             {

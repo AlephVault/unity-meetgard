@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using UnityEngine;
 
 namespace AlephVault.Unity.Meetgard
 {
@@ -128,6 +129,7 @@ namespace AlephVault.Unity.Meetgard
                 {
                     // Keep the exception, and return from the
                     // whole thread execution.
+                    Debug.LogException(e);
                     lifeCycleException = e;
                 }
                 finally
