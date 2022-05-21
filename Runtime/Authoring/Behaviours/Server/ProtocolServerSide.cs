@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -33,6 +34,9 @@ namespace AlephVault.Unity.Meetgard
                 {
                     // The related network server.
                     protected NetworkServer server;
+
+                    // A mutex for protocol-exclusive actions handling the sessions
+                    private SemaphoreSlim mutex = new SemaphoreSlim(1, 1);
 
                     /// <summary>
                     ///   The related queue manager.
@@ -370,6 +374,24 @@ namespace AlephVault.Unity.Meetgard
                         where T : ISerializable
                     {
                         return server.Broadcast<ProtocolType, T>(message, clientIds, content);
+                    }
+
+                    /// <summary>
+                    ///   Runs a task in exclusive mode for this protocol.
+                    ///   This does not necessarily use the main thread.
+                    /// </summary>
+                    /// <param name="action"></param>
+                    public async Task Exclusive(Func<Task> action)
+                    {
+                        try
+                        {
+                            await mutex.WaitAsync();
+                            await action();
+                        }
+                        finally
+                        {
+                            mutex.Release();
+                        }
                     }
 
                     /// <summary>

@@ -63,6 +63,29 @@ namespace AlephVault.Unity.Meetgard
                         }
                     }
 
+                    /// <summary>
+                    ///   Returns the native remote endpoint of a connection.
+                    ///   Since our connections are only IP, most of the data
+                    ///   will be constant.
+                    /// </summary>
+                    /// <param name="connectionId">The id of the connection to get the endpoint for</param>
+                    /// <returns>The native remote endpoint data</returns>
+                    /// <exception cref="InvalidOperationException">The connection is invalid or not available</exception>
+                    public IPEndPoint GetRemoteEndpoint(ulong connectionId)
+                    {
+                        try
+                        {
+                            return endpointById[connectionId].RemoteEndpoint;
+                        }
+                        catch (KeyNotFoundException e)
+                        {
+                            throw new InvalidOperationException($"Connection id {connectionId} is not " +
+                                                                $"available. It might be already terminated " +
+                                                                $"or an arbitrary value, not tested to exist " +
+                                                                $"as a valid connection id");
+                        }
+                    }
+
                     // Creates a NetworkRemoteEndpoint for the given client
                     // socket (which is a just-accepted socket), and adds
                     // it to the registered endpoints. This is ran on the

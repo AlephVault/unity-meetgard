@@ -32,16 +32,19 @@ namespace AlephVault.Unity.Meetgard
                             // The server is considered connected right now.
                             PrepareCertificate();
                             DoTriggerOnServerStarted();
+                            bool waitingMutex = false;
                             // Accepts all of the incoming connections, ad eternum.
                             while (true) try
                             {
                                 TcpClient newClient = listener.AcceptTcpClient();
                                 connectionIdPoolMutex.Wait();
+                                waitingMutex = true;
                                 AddNetworkClientEndpoint(newClient);
                             }
                             finally
                             {
-                                connectionIdPoolMutex.Release();
+                                if (waitingMutex) connectionIdPoolMutex.Release();
+                                waitingMutex = false;
                             }
 
                         }

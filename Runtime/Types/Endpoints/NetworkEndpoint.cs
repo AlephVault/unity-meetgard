@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -52,6 +53,14 @@ namespace AlephVault.Unity.Meetgard
             ///   Closes the connection.
             /// </summary>
             public abstract void Close();
+
+            /// <summary>
+            ///   The metadata for this endpoint.
+            /// </summary>
+            public abstract IPEndPoint RemoteEndpoint
+            {
+                get;
+            }
 
             /// <summary>
             ///   Sends a message, specifying metadata for

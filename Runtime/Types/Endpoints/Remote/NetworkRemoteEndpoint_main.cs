@@ -2,6 +2,7 @@ using AlephVault.Unity.Support.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -52,6 +53,19 @@ namespace AlephVault.Unity.Meetgard
             // The function to get the appropriate SSL stream. It will use
             // a default return if the provider is not using a secure protocol.
             private Func<NetworkStream, Stream> streamFactory;
+
+            public override IPEndPoint RemoteEndpoint
+            {
+                get
+                {
+                    if (IsConnected)
+                    {
+                        return (IPEndPoint)remoteSocket.Client.RemoteEndPoint;
+                    }
+
+                    return null;
+                }
+            }
 
             public NetworkRemoteEndpoint(
                 TcpClient endpointSocket, Func<NetworkStream, Stream> getStream, Func<ushort, ushort, ISerializable> protocolMessageFactory,
