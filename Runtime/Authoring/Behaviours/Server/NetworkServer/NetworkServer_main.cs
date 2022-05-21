@@ -164,7 +164,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <returns>A task, if the client exists, or null otherwise</returns>
                     public Task Send(IProtocolServerSide protocol, string message, ulong clientId)
                     {
-                        return Send(protocol, message, clientId, new Nothing());
+                        return Send(protocol, message, clientId, Nothing.Instance);
                     }
 
                     /// <summary>
@@ -199,7 +199,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <returns>A task, if the client exists, or null otherwise</returns>
                     public Task Send<ProtocolType>(string message, ulong clientId) where ProtocolType : IProtocolServerSide
                     {
-                        return Send<ProtocolType, Nothing>(message, clientId, new Nothing());
+                        return Send<ProtocolType, Nothing>(message, clientId, Nothing.Instance);
                     }
 
                     /// <summary>
@@ -270,7 +270,7 @@ namespace AlephVault.Unity.Meetgard
                     public Func<ulong, Task> MakeSender(IProtocolServerSide protocol, string message)
                     {
                         Func<ulong, Nothing, Task> sender = MakeSender<Nothing>(protocol, message);
-                        return (clientId) => sender(clientId, new Nothing());
+                        return (clientId) => sender(clientId, Nothing.Instance);
                     }
 
                     /// <summary>
@@ -305,7 +305,7 @@ namespace AlephVault.Unity.Meetgard
                     public Func<ulong, Task> MakeSender<ProtocolType>(string message) where ProtocolType : IProtocolServerSide
                     {
                         Func<ulong, Nothing, Task> sender = MakeSender<ProtocolType, Nothing>(message);
-                        return (clientId) => sender(clientId, new Nothing());
+                        return (clientId) => sender(clientId, Nothing.Instance);
                     }
 
                     /// <summary>
@@ -379,7 +379,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <returns>The send tasks for each endpoint that was iterated</returns>
                     public Dictionary<ulong, Task> Broadcast(IProtocolServerSide protocol, string message, IEnumerable<ulong> clientIds)
                     {
-                        return Broadcast(protocol, message, clientIds, new Nothing());
+                        return Broadcast(protocol, message, clientIds, Nothing.Instance);
                     }
 
                     private Dictionary<ulong, Task> DoBroadcast<T>(ushort protocolId, ushort messageTag, IEnumerable<ulong> clientIds, T content) where T : ISerializable
@@ -485,7 +485,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <returns>The send tasks for each endpoint that was iterated</returns>
                     public Dictionary<ulong, Task> Broadcast<ProtocolType>(string message, IEnumerable<ulong> clientIds) where ProtocolType : IProtocolServerSide
                     {
-                        return Broadcast<ProtocolType, Nothing>(message, clientIds, new Nothing());
+                        return Broadcast<ProtocolType, Nothing>(message, clientIds, Nothing.Instance);
                     }
 
                     /// <summary>
@@ -560,7 +560,7 @@ namespace AlephVault.Unity.Meetgard
                     public Func<IEnumerable<ulong>, Dictionary<ulong, Task>> MakeBroadcaster(IProtocolServerSide protocol, string message)
                     {
                         Func<IEnumerable<ulong>, Nothing, Dictionary<ulong, Task>> broadcaster = MakeBroadcaster<Nothing>(protocol, message);
-                        return (clientIds) => broadcaster(clientIds, new Nothing());
+                        return (clientIds) => broadcaster(clientIds, Nothing.Instance);
                     }
 
                     /// <summary>
@@ -595,7 +595,7 @@ namespace AlephVault.Unity.Meetgard
                     public Func<IEnumerable<ulong>, Dictionary<ulong, Task>> MakeBroadcaster<ProtocolType>(string message) where ProtocolType : IProtocolServerSide
                     {
                         Func<IEnumerable<ulong>, Nothing, Dictionary<ulong, Task>> broadcaster = MakeBroadcaster<ProtocolType, Nothing>(message);
-                        return (clientIds) => broadcaster(clientIds, new Nothing());
+                        return (clientIds) => broadcaster(clientIds, Nothing.Instance);
                     }
 
                     /// <summary>

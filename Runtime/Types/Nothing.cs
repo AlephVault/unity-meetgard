@@ -13,6 +13,12 @@ namespace AlephVault.Unity.Meetgard
         /// </summary>
         public class Nothing : ISerializable
         {
+            /// <summary>
+            ///   An instance to use everywhere without having to
+            ///   create one everywhere.
+            /// </summary>
+            public static Nothing Instance = new Nothing();
+
             public void Serialize(Serializer serializer) {}
         }
     }

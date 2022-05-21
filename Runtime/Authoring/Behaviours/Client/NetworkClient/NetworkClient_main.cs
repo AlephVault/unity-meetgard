@@ -156,7 +156,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <param name="content">The message content</param>
                     public Task Send(IProtocolClientSide protocol, string message)
                     {
-                        return Send(protocol, message, new Nothing());
+                        return Send(protocol, message, Nothing.Instance);
                     }
 
                     /// <summary>
@@ -189,7 +189,7 @@ namespace AlephVault.Unity.Meetgard
                     /// <param name="message">The message (as it was registered) being sent</param>
                     public Task Send<ProtocolType>(string message) where ProtocolType : IProtocolClientSide
                     {
-                        return Send<ProtocolType, Nothing>(message, new Nothing());
+                        return Send<ProtocolType, Nothing>(message, Nothing.Instance);
                     }
 
                     /// <summary>
@@ -251,7 +251,7 @@ namespace AlephVault.Unity.Meetgard
                     public Func<Task> MakeSender(IProtocolClientSide protocol, string message)
                     {
                         Func<Nothing, Task> sender = MakeSender<Nothing>(protocol, message);
-                        return () => sender(new Nothing());
+                        return () => sender(Nothing.Instance);
                     }
 
                     /// <summary>
@@ -287,7 +287,7 @@ namespace AlephVault.Unity.Meetgard
                     public Func<Task> MakeSender<ProtocolType>(string message) where ProtocolType : IProtocolClientSide
                     {
                         Func<Nothing, Task> sender = MakeSender<ProtocolType, Nothing>(message);
-                        return () => sender(new Nothing());
+                        return () => sender(Nothing.Instance);
                     }
 
                     /// <summary>

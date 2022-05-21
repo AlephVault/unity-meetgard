@@ -178,7 +178,7 @@ namespace AlephVault.Unity.Meetgard
                     protected Func<Task> MakeSender(string message)
                     {
                         Func<Nothing, Task> sender = MakeSender<Nothing>(message);
-                        return () => sender(new Nothing());
+                        return () => sender(Nothing.Instance);
                     }
 
                     /// <summary>
