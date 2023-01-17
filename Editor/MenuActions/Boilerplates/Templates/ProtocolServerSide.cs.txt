@@ -1,5 +1,176 @@
+using System;
+using System.Threading.Tasks;
 using AlephVault.Unity.Meetgard.Authoring.Behaviours.Server;
+using Protocols;
 
 namespace Server.Authoring.Behaviours.Protocols
 {
+    public class #SCRIPTNAME# : ProtocolServerSide<#PROTOCOL#ProtocolDefinition>
+    {
+        // Define variables to hold senders, one for each defined
+        // client message. For this generated boilerplate examples,
+        // as per the #PROTOCOL#ProtocolDefinition class, you'll
+        // need these examples. Work analogous to create your own
+        // messages and their senders.
+        //
+        // private Func<ulong, Task> SendIntroduceYourself;
+        // private Func<ulong, MyType, Task> SendSomeTypedMessage;
+        //
+        // NOTES: These function references can be invoked ANYWHERE,
+        // not just in the context of the incoming message handlers
+        // that are defined below, as long as the protocol is ready.
+        //
+        // If it is needed to have a sender that works for multiple
+        // connections simultaneously, declare a BROADCASTER instead:
+        //
+        // private Func<IEnumerable<ulong>, Dictionary<ulong, Task>> BroadcastHello;
+        // private Func<IEnumerable<ulong>, MyType, Dictionary<ulong, Task>> BroadcastSomeTypedMessage;
+        
+        /// <summary>
+        ///   A Post-Awake hook.
+        /// </summary>
+        protected override void Setup()
+        {
+            // This method is optional. It can be removed.
+        }
+        
+        /// <summary>
+        ///   Initializes the protocol senders & broadcasters once
+        ///   the server is ready.
+        /// </summary>
+        protected override void Initialize()
+        {
+            // This is the place to assign the initialization of
+            // these message senders by calling MakeSender or
+            // MakeSender<T>, depending on how the message was
+            // defined in the protocol.
+            //
+            // SendSomeTypedMessage = MakeSender<MyType2>("SomeTypedClientMessage");
+            // SendHello = MakeSender("Hello");
+            //
+            // You can also assign this error handler:
+            // OnSendError = async (exc) { ... process an exception ... };
+            //
+            // That one will allow you to wrap any message send:
+            //
+            // await UntilSendIsDone(SendHello(someClientId));
+            // await UntilSendIsDone(SendSomeTypedMessage(someClientId, new MyType2(...)));
+            //
+            // Which will capture any error by calling OnSendError(e).
+        }
+        
+        /// <summary>
+        ///   Initializes the protocol handlers once the server is ready.
+        /// </summary>
+        protected override void SetIncomingMessageHandlers()
+        {
+            // AddIncomingMessageHandler("Hello", async (proto, clientId) {
+            //     // Receives an untyped message from a given connection.
+            //     // This message has no data. Only the proto argument
+            //     // and the clientId argument are specified (the clientId
+            //     // identifies the client connection).
+            //     //
+            //     // You can do what you want here, including sending messages:
+            //     // _ = SendIntroduceYourself(clientId); // or any other valid
+            //     //                                      // clientId!
+            //     // or: await SendIntroduceYourself(clientId);
+            //     // The difference is that, by awaiting, we ensure the message
+            //     // was actually sent or an error was triggered.
+            //     //
+            //     // Perhaps, even broadcasting some messages:
+            //     // _ = BroadcastSomeTypedMessage(
+            //     //         null /* for all connections */ | someIEnumerable<long> /* for certain connections */,
+            //     //         new MyType(...)
+            //     //     );
+            //     // While it is not always recommended, you could wait for the
+            //     // broadcast by wrapping that call in:
+            //     //
+            //     // (This call might hog or take a lot)
+            //     // await UntilBroadcastIsDone(BroadcastSomeTypedMessage(...));
+            //     //
+            //     // PLEASE NOTE: IF YOUR CODE INVOLVES INTERACTION WITH UNITY
+            //     // COMPONENTS, THIS MUST ONLY OCCUR IN THE MAIN THREAD, and
+            //     // these handlers DO NOT RUN IN THE MAIN THREAD. You can do
+            //     // it by calling:
+            //     //
+            //     // await RunInMainThread(async () { ... the code ... });...
+            //     //
+            //     // Or, if waiting for it is not needed, just:
+            //     //
+            //     // _ = RunInMainThread(async () { ... the code ... });            
+            // });
+            // AddIncomingMessageHandler<MyType>("SomeTypedClientMessage", async (proto, clientId, msg) {
+            // });
+        }
+        
+        /// <summary>
+        ///   Handler for when a client connection is established.
+        /// </summary>
+        public override async Task OnConnected(ulong clientId)
+        {
+            // This method is optional. It can be removed.
+            //
+            // Notice how the connections are identified by some sort
+            // of clientId. Typically, some set of custom dictionaries
+            // are used to track the life of client connections.
+            //
+            // If you need to interact with Unity components,
+            // use RunInMainThread in the same way it is told
+            // in this example inside the incoming message
+            // handlers.
+        }
+
+        /// <summary>
+        ///   Handler for when a client connection is terminated,
+        ///   be it graceful or due to an error.
+        /// </summary>
+        public override async Task OnDisconnected(ulong clientId, Exception reason)
+        {
+            // This method is optional. It can be removed.
+            //
+            // Only per-client setup should be done. Do not
+            // attempt to send any message to that client: it
+            // has already disconnected.
+            //
+            // If you need to interact with Unity components,
+            // use RunInMainThread in the same way it is told
+            // in this example inside the incoming message
+            // handlers.
+        }
+        
+        /// <summary>
+        ///   Handler for when the server is successfully started.
+        /// </summary>
+        public override async Task OnServerStarted()
+        {
+            // This method is optional. It can be removed.
+            //
+            // Only setup operations should be done here.
+            //
+            // If you need to interact with Unity components,
+            // use RunInMainThread in the same way it is told
+            // in this example inside the incoming message
+            // handlers.
+        }
+
+        /// <summary>
+        ///   Handler for when the server is shutdown, be it graceful or due
+        ///   to an error.
+        /// </summary>
+        public override async Task OnServerStopped(Exception e)
+        {
+            // This method is optional. It can be removed.
+            //
+            // Only cleanup operations should be done here.
+            // Do not attempt to send any message here, since
+            // any attempt will fail (and should be considered
+            // unstable and unsafe if, for some reason, any
+            // connection still remains).
+            //
+            // If you need to interact with Unity components,
+            // use RunInMainThread in the same way it is told
+            // in this example inside the incoming message
+            // handlers.
+        }
+    }
 }

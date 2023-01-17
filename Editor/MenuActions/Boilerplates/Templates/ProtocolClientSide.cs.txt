@@ -53,7 +53,7 @@ namespace Client.Authoring.Behaviours.Protocols
         }
         
         /// <summary>
-        ///   Initializes the protocol senders once the server is ready.
+        ///   Initializes the protocol handlers once the server is ready.
         /// </summary>
         protected override void SetIncomingMessageHandlers()
         {
