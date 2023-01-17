@@ -2,7 +2,8 @@
     "name": "AlephVault.Unity.Meetgard.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:f90bbbab12f82970aadf435cc687514a"
+        "GUID:f90bbbab12f82970aadf435cc687514a",
+        "GUID:0c7703a0282a77d4ea0e67ece4526024"
     ],
     "includePlatforms": [
         "Editor"
