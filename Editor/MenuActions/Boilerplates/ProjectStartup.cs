@@ -26,7 +26,7 @@ namespace GameMeanMachine.Unity.WindRose
                 ///       - Behaviours/: Protocols/, UI/.
                 ///   - Protocols/Messages.
                 /// </summary>
-                [MenuItem("Assets/Create/MeetGard/Boilerplates/Project Startup", false, 11)]
+                [MenuItem("Assets/Create/Meetgard/Boilerplates/Project Startup", false, 11)]
                 public static void ExecuteBoilerplate()
                 {
                     new Boilerplate()

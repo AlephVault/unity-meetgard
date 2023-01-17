@@ -1,0 +1,53 @@
+using AlephVault.Unity.Meetgard.Protocols;
+
+namespace Protocols {
+    public class #SCRIPTNAME# : ProtocolDefinition
+    {
+        /// <summary>
+        ///   Defines all the messages that can be sent from a client
+        ///   to the server, and from the server to a client.
+        /// </summary>
+        protected override void DefineMessages()
+        {
+            // Define server to client messages like this.
+            // Please note: the string argument is a name, which must
+            // be unique among server message definitions in this
+            // protocol (it doesn't matter if other protocols also
+            // define messages using this name, or of there are client
+            // messages with the same name: the uniqueness is enforced
+            // among server-side messages, regardless of their type).
+            
+            // This is an example of a server message with no data
+            // attached to it.
+            //
+            // DefineServerMessage("IntroduceYourself");
+            
+            // This is an example of a typed message with some data
+            // attached to it. The type is not arbitrary: it must
+            // implement the AlephVault.Unity.Binary.ISerializable
+            // interfaces, or be one of the types defined in such
+            // namespace (e.g. Int, UInt, Bool, Color, String, ...).
+            //
+            // DefineServerMessage<MyType>("SomeTypedServerMessage");
+            
+            // Define client to server messages like this.
+            // Please note: the string argument is a name, which must
+            // be unique among client messages definitions in this
+            // protocol (as in the server messages: the uniqueness is
+            // enforced only among client to server messages defined
+            // in this protocol only).
+            
+            // This is an example of a client message with no data
+            // attached to it.
+            // 
+            // DefineClientMessage("Hello");
+            
+            // This is an example of a typed message with some data
+            // attached to it. The type is not arbitrary: it must
+            // satisfy the same constraint detailed for the typed
+            // server to client messages.
+            //
+            // DefineClientMessage<MyType2>("SomeTypedClientMessage");
+        }
+    }
+}
