@@ -124,6 +124,16 @@ namespace AlephVault.Unity.Meetgard
                     return pendingHandshakeConnections.TryRemove(connection, out _);
                 }
 
+                /// <summary>
+                ///   Tells whether a connection is pending.
+                /// </summary>
+                /// <param name="connection">The connection to test</param>
+                /// <returns>Whether the connection is pending or not</returns>
+                protected bool IsConnectionHandshakePending(ulong connection)
+                {
+                    return pendingHandshakeConnections.ContainsKey(connection);
+                }
+
                 // Updates all of the pending connections.
                 private async void UpdateHandshakePendingTimers(float delta)
                 {
