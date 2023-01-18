@@ -104,15 +104,21 @@ namespace AlephVault.Unity.Meetgard
                     RemoveHandshakePending(clientId);
                 }
                 
-                // Adds a connection id to the handshake-pending
-                // connections.
+                /// <summary>
+                ///   Adds a connection to the pool of pending connections.
+                /// </summary>
+                /// <param name="connection">The connection to add</param>
+                /// <returns>Whether the connection was added or already existed</returns>
                 protected bool AddHandshakePending(ulong connection)
                 {
                     return pendingHandshakeConnections.TryAdd(connection, 0);
                 }
 
-                // Removes a connection id from the handshake pending
-                // connections.
+                /// <summary>
+                ///   Removes a connection from the pool of pending connections.
+                /// </summary>
+                /// <param name="connection">The connection to remove</param>
+                /// <returns>Whether the connection was removed or was never there</returns>
                 protected bool RemoveHandshakePending(ulong connection)
                 {
                     return pendingHandshakeConnections.TryRemove(connection, out _);
