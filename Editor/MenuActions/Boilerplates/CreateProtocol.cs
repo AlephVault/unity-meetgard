@@ -5,7 +5,7 @@ using AlephVault.Unity.MenuActions.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace GameMeanMachine.Unity.WindRose
+namespace AlephVault.Unity.Meetgard
 {
     namespace MenuActions
     {
