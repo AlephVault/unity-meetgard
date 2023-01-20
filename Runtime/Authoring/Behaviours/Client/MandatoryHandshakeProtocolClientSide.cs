@@ -13,14 +13,9 @@ namespace AlephVault.Unity.Meetgard
             ///   This is the client-side implementation of a mandatory
             ///   handshake protocol. In this case, the client-side
             ///   will have a Welcome and a Timeout event, which are
-            ///   triggered on the respective messages. The children
-            ///   classes should at least add a default implementation
-            ///   for the Welcome event to send the expected mandatory
-            ///   handshake message.
+            ///   triggered on the respective messages.
             /// </summary>
-            /// <typeparam name="Definition">A subclass of <see cref="MandatoryHandshakeProtocolDefinition"/></typeparam>
-            public abstract class MandatoryHandshakeProtocolClientSide<Definition> : ProtocolClientSide<Definition>
-                where Definition : MandatoryHandshakeProtocolDefinition, new()
+            public class MandatoryHandshakeProtocolClientSide : ProtocolClientSide<MandatoryHandshakeProtocolDefinition>
             {
                 protected override void SetIncomingMessageHandlers()
                 {

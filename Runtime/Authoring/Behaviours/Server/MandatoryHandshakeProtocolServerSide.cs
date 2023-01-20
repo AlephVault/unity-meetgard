@@ -22,9 +22,7 @@ namespace AlephVault.Unity.Meetgard
             ///   completed and remove the connection from being
             ///   handshake-pending, so timeouts do not occur.
             /// </summary>
-            /// <typeparam name="Definition">A subclass of <see cref="MandatoryHandshakeProtocolDefinition"/></typeparam>
-            public abstract class MandatoryHandshakeProtocolServerSide<Definition> : ProtocolServerSide<Definition>
-                where Definition : MandatoryHandshakeProtocolDefinition, new()
+            public class MandatoryHandshakeProtocolServerSide : ProtocolServerSide<MandatoryHandshakeProtocolDefinition>
             {
                 /// <summary>
                 ///   The timeout to kick a connection that did
@@ -109,7 +107,7 @@ namespace AlephVault.Unity.Meetgard
                 /// </summary>
                 /// <param name="connection">The connection to add</param>
                 /// <returns>Whether the connection was added or already existed</returns>
-                protected bool AddHandshakePending(ulong connection)
+                private bool AddHandshakePending(ulong connection)
                 {
                     return pendingHandshakeConnections.TryAdd(connection, 0);
                 }
@@ -119,7 +117,7 @@ namespace AlephVault.Unity.Meetgard
                 /// </summary>
                 /// <param name="connection">The connection to remove</param>
                 /// <returns>Whether the connection was removed or was never there</returns>
-                protected bool RemoveHandshakePending(ulong connection)
+                public bool RemoveHandshakePending(ulong connection)
                 {
                     return pendingHandshakeConnections.TryRemove(connection, out _);
                 }
@@ -129,7 +127,7 @@ namespace AlephVault.Unity.Meetgard
                 /// </summary>
                 /// <param name="connection">The connection to test</param>
                 /// <returns>Whether the connection is pending or not</returns>
-                protected bool IsConnectionHandshakePending(ulong connection)
+                public bool IsConnectionHandshakePending(ulong connection)
                 {
                     return pendingHandshakeConnections.ContainsKey(connection);
                 }
