@@ -35,6 +35,7 @@ namespace AlephVault.Unity.Meetgard
                             // of the messages immediately. Nevertheless, the event
                             // exists because it is triggered. Expect a disconnection
                             // after this event triggers.
+                            client.Close();
                             await (OnTimeout?.InvokeAsync() ?? Task.CompletedTask);
                         });
                     }
