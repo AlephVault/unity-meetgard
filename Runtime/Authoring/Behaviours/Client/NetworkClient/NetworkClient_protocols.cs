@@ -157,6 +157,7 @@ namespace AlephVault.Unity.Meetgard
                             }
                         }
                         debugger.End();
+                        OnConnected?.Invoke();
                     }
 
                     // This function gets invoked when the network client
@@ -180,6 +181,7 @@ namespace AlephVault.Unity.Meetgard
                             }
                         }
                         debugger.End();
+                        OnDisconnected?.Invoke();
                     }
                 }
             }

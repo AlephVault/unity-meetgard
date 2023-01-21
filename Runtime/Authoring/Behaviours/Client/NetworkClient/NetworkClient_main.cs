@@ -303,6 +303,17 @@ namespace AlephVault.Unity.Meetgard
 
                         endpoint.Close();
                     }
+
+                    /// <summary>
+                    ///   An event to attend when this client established a connection (at UI level, typically).
+                    /// </summary>
+                    public event Action OnConnected;
+                    
+                    /// <summary>
+                    ///   An event to attend when this client ends its connection (at UI level, typically).
+                    ///   It is NOT triggered when the client fails to connect.
+                    /// </summary>
+                    public event Action OnDisconnected;
                 }
             }
         }
