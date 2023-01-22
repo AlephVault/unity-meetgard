@@ -5,7 +5,7 @@ using Protocols;
 
 namespace Client.Authoring.Behaviours.Protocols
 {
-    public class #SCRIPTNAME# : ProtocolClientSide<#PROTOCOL#ProtocolDefinition>
+    public class #SCRIPTNAME# : ProtocolClientSide<#PROTOCOL_DEFINITION#ProtocolDefinition>
     {
         // Define variables to hold senders, one for each defined
         // client message. For this generated boilerplate examples,

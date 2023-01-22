@@ -9,7 +9,7 @@ namespace Server.Authoring.Behaviours.Protocols
     {
         // Define variables to hold senders, one for each defined
         // client message. For this generated boilerplate examples,
-        // as per the #PROTOCOL#ProtocolDefinition class, you'll
+        // as per the #PROTOCOL# class, you'll
         // need these examples. Work analogous to create your own
         // messages and their senders.
         //
