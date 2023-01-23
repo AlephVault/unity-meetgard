@@ -108,9 +108,9 @@ namespace Server.Authoring.Behaviours.Protocols
             //     // _ = RunInMainThread(async () { ... the code ... });
             //
             //     // If this class makes use of throttling, this could be used:
-            //     // await throttler.DoThrottled(async () => {
+            //     // await throttler.DoThrottled(clientId, async () => {
             //     //     ... implementation ...
-            //     // }[, (ulong connId, DateTime when, int throttlesCount) => { ... on throttled ...}]);
+            //     // }[, (ulong clientId, DateTime when, int throttlesCount) => { ... on throttled ...}]);
             //     // Which allows the protocol to throttle a message and, optionally,
             //     // also attend a callback telling how many consecutive throttled
             //     // messages did the client connection attempt.
