@@ -1,15 +1,18 @@
 using System;
 using System.Threading.Tasks;
+using UnityEngine;
 using AlephVault.Unity.Meetgard.Authoring.Behaviours.Server;
 using Protocols;
 
 namespace Server.Authoring.Behaviours.Protocols
 {
-    public class #SCRIPTNAME# : ProtocolServerSide<#PROTOCOL#ProtocolDefinition>
+    // Uncomment this line if this class should use throttling.
+    // [RequireComponent(typeof(ServerSideThrottler))]
+    public class #SCRIPTNAME# : ProtocolServerSide<#PROTOCOLDEFINITION#>
     {
         // Define variables to hold senders, one for each defined
         // client message. For this generated boilerplate examples,
-        // as per the #PROTOCOL# class, you'll
+        // as per the #PROTOCOLDEFINITION# class, you'll
         // need these examples. Work analogous to create your own
         // messages and their senders.
         //
@@ -25,13 +28,18 @@ namespace Server.Authoring.Behaviours.Protocols
         //
         // private Func<IEnumerable<ulong>, Dictionary<ulong, Task>> BroadcastHello;
         // private Func<IEnumerable<ulong>, MyType, Dictionary<ulong, Task>> BroadcastSomeTypedMessage;
-        
+
+        // Uncomment this line if this class should use throttling.
+        // private ServerSideThrottler throttler;
+                
         /// <summary>
         ///   A Post-Awake hook.
         /// </summary>
         protected override void Setup()
         {
             // This method is optional. It can be removed.
+            // Uncomment this line if this class should use throttling.
+            // throttler = GetComponent<ServerSideThrottler>();
         }
         
         /// <summary>
@@ -64,7 +72,7 @@ namespace Server.Authoring.Behaviours.Protocols
         /// </summary>
         protected override void SetIncomingMessageHandlers()
         {
-            // AddIncomingMessageHandler("Hello", async (proto, clientId) {
+            // AddIncomingMessageHandler("Hello", async (proto, clientId) => {
             //     // Receives an untyped message from a given connection.
             //     // This message has no data. Only the proto argument
             //     // and the clientId argument are specified (the clientId
@@ -97,9 +105,24 @@ namespace Server.Authoring.Behaviours.Protocols
             //     //
             //     // Or, if waiting for it is not needed, just:
             //     //
-            //     // _ = RunInMainThread(async () { ... the code ... });            
+            //     // _ = RunInMainThread(async () { ... the code ... });
+            //
+            //     // If this class makes use of throttling, this could be used:
+            //     // await throttler.DoThrottled(async () => {
+            //     //     ... implementation ...
+            //     // }[, (ulong connId, DateTime when, int throttlesCount) => { ... on throttled ...}]);
+            //     // Which allows the protocol to throttle a message and, optionally,
+            //     // also attend a callback telling how many consecutive throttled
+            //     // messages did the client connection attempt.
+            //     //
+            //     // The throttling can be controlled by throttler.Lapse.
+            //     // See all that class' public methods for more details.
             // });
-            // AddIncomingMessageHandler<MyType>("SomeTypedClientMessage", async (proto, clientId, msg) {
+            //
+            // AddIncomingMessageHandler<MyType>("SomeTypedClientMessage", async (proto, clientId, msg) => {
+            //     // This is the same as the previous, except that this handler
+            //     // is for a TYPED message, and thus it has an extra argument
+            //     // in the signature, which stands for the received data.
             // });
         }
         
@@ -118,6 +141,9 @@ namespace Server.Authoring.Behaviours.Protocols
             // use RunInMainThread in the same way it is told
             // in this example inside the incoming message
             // handlers.
+            
+            // Uncomment this line if your class should use throttling.
+            // throttler.TrackConnection(clientId);
         }
 
         /// <summary>
@@ -136,6 +162,9 @@ namespace Server.Authoring.Behaviours.Protocols
             // use RunInMainThread in the same way it is told
             // in this example inside the incoming message
             // handlers.
+
+            // Uncomment this line if your class should use throttling.
+            // throttler.UntrackConnection(clientId);
         }
         
         /// <summary>
@@ -151,6 +180,9 @@ namespace Server.Authoring.Behaviours.Protocols
             // use RunInMainThread in the same way it is told
             // in this example inside the incoming message
             // handlers.
+
+            // Uncomment this line if your class should use throttling.
+            // throttler.Startup();
         }
 
         /// <summary>
@@ -171,6 +203,9 @@ namespace Server.Authoring.Behaviours.Protocols
             // use RunInMainThread in the same way it is told
             // in this example inside the incoming message
             // handlers.
+
+            // Uncomment this line if your class should use throttling.
+            // throttler.Teardown();
         }
     }
 }

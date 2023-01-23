@@ -25,9 +25,8 @@ namespace AlephVault.Unity.Meetgard
                 ///     It is related to a particular protocol definition.
                 ///   </para>
                 /// </summary>
+                /// <typeparam name="Definition">The related protocol definition</typeparam>
                 [RequireComponent(typeof(NetworkClient))]
-                // TODO Later, ensure NetworkClient is abstract and we have
-                // TODO both NetworkRemoteClient and NetworkLocalClient.
                 [DisallowMultipleComponent]
                 public abstract class ProtocolClientSide<Definition> : MonoBehaviour, IProtocolClientSide where Definition : ProtocolDefinition, new()
                 {

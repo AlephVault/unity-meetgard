@@ -83,7 +83,7 @@ WARNING: THIS MIGHT OVERRIDE EXISTING CODE. Always use proper source code manage
                     );
                     Dictionary<string, string> replacements = new Dictionary<string, string>
                     {
-                        {"PROTOCOL", basename}
+                        {"PROTOCOLDEFINITION", basename + "ProtocolDefinition"}
                     };
 
                     new Boilerplate()

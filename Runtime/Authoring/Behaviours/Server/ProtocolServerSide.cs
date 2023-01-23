@@ -28,6 +28,7 @@ namespace AlephVault.Unity.Meetgard
                 ///     It is related to a particular protocol definition.
                 ///   </para>
                 /// </summary>
+                /// <typeparam name="Definition">The related protocol definition</typeparam>
                 [RequireComponent(typeof(NetworkServer))]
                 [DisallowMultipleComponent]
                 public abstract class ProtocolServerSide<Definition> : MonoBehaviour, IProtocolServerSide where Definition : ProtocolDefinition, new()

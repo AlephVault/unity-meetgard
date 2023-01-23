@@ -1,15 +1,18 @@
 using System;
 using System.Threading.Tasks;
+using UnityEngine;
 using AlephVault.Unity.Meetgard.Authoring.Behaviours.Client;
 using Protocols;
 
 namespace Client.Authoring.Behaviours.Protocols
 {
-    public class #SCRIPTNAME# : ProtocolClientSide<#PROTOCOL_DEFINITION#ProtocolDefinition>
+    // Uncomment this line if this class should use throttling.
+    // [RequireComponent(typeof(ClientSideThrottler))]
+    public class #SCRIPTNAME# : ProtocolClientSide<#PROTOCOLDEFINITION#>
     {
         // Define variables to hold senders, one for each defined
         // client message. For this generated boilerplate examples,
-        // as per the #PROTOCOL#ProtocolDefinition class, you'll
+        // as per the #PROTOCOLDEFINITION# class, you'll
         // need these examples. Work analogous to create your own
         // messages and their senders.
         //
@@ -19,6 +22,9 @@ namespace Client.Authoring.Behaviours.Protocols
         // NOTES: These function references can be invoked ANYWHERE,
         // not just in the context of the incoming message handlers
         // that are defined below, as long as the protocol is ready.
+
+        // Uncomment this line if this class should use throttling.
+        // private ClientSideThrottler throttler;
         
         /// <summary>
         ///   A Post-Awake hook.
@@ -26,6 +32,8 @@ namespace Client.Authoring.Behaviours.Protocols
         protected override void Setup()
         {
             // This method is optional. It can be removed.
+            // Uncomment this line if this class should use throttling.
+            // throttler = GetComponent<ClientSideThrottler>();
         }
         
         /// <summary>
@@ -50,6 +58,10 @@ namespace Client.Authoring.Behaviours.Protocols
             // await UntilSendIsDone(SendSomeTypedMessage(new MyType2(...)));
             //
             // Which will capture any error by calling OnSendError(e).
+            //
+            // Notes: If your class uses the throttler, create lines like this:
+            // SendSomeTypedMessage = throttler.MakeThrottledSender(SendSomeTypedMessage);
+            // SendHello = throttler.MakeThrottledSender(SendHello);
         }
         
         /// <summary>
@@ -118,6 +130,6 @@ namespace Client.Authoring.Behaviours.Protocols
             // use RunInMainThread in the same way it is told
             // in this example inside the incoming message
             // handlers.
-        }
+        }        
     }
 }
