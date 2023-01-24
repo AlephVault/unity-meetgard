@@ -121,7 +121,7 @@ WARNING: THIS MIGHT OVERRIDE EXISTING CODE. Always use proper source code manage
                 /// <summary>
                 ///   Opens a dialog to execute the strategy creation boilerplate.
                 /// </summary>
-                [MenuItem("Assets/Create/Meetgard/Boilerplates/Create Protocol", false, 12)]
+                [MenuItem("Assets/Create/Meetgard/Boilerplates/Create Protocol", false, 201)]
                 public static void ExecuteBoilerplate()
                 {
                     CreateProtocolWindow window = ScriptableObject.CreateInstance<CreateProtocolWindow>();
