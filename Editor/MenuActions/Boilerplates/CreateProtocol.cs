@@ -119,7 +119,7 @@ WARNING: THIS MIGHT OVERRIDE EXISTING CODE. Always use proper source code manage
                 }
                 
                 /// <summary>
-                ///   Opens a dialog to execute the strategy creation boilerplate.
+                ///   Opens a dialog to execute the protocol creation boilerplate.
                 /// </summary>
                 [MenuItem("Assets/Create/Meetgard/Boilerplates/Create Protocol", false, 201)]
                 public static void ExecuteBoilerplate()
