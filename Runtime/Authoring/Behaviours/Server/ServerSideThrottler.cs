@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AlephVault.Unity.Binary;
-using AlephVault.Unity.Meetgard.Authoring.Behaviours.Server;
-using AlephVault.Unity.Meetgard.Protocols;
 using AlephVault.Unity.Support.Utils;
 using UnityEngine;
 
@@ -194,12 +191,14 @@ namespace AlephVault.Unity.Meetgard
                     /// </summary>
                     /// <param name="connectionId">The connection id requesting the action</param>
                     /// <param name="callback">The callback</param>
+                    /// <param name="index">The optional throttle index to use for the checks</param>
                     /// <param name="onCommandThrottled">The callback that runs when the command is throttled</param>
                     public async Task DoThrottled(
                         ulong connectionId, Func<Task> callback,
-                        Func<ulong, DateTime, int, Task> onCommandThrottled = null
+                        Func<ulong, DateTime, int, Task> onCommandThrottled = null,
+                        int index = 0
                     ) {
-                        if (await CheckConnectionCommand(connectionId, onCommandThrottled))
+                        if (await CheckConnectionCommand(connectionId, onCommandThrottled, index))
                         {
                             await callback();
                         }

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AlephVault.Unity.Meetgard.Protocols;
 using AlephVault.Unity.Support.Authoring.Behaviours;
+using AlephVault.Unity.Support.Utils;
 using UnityEngine;
 
 namespace AlephVault.Unity.Meetgard
@@ -15,22 +16,64 @@ namespace AlephVault.Unity.Meetgard
                 /// <summary>
                 ///   This helper provides features to send throttled messages.
                 /// </summary>
-                [RequireComponent(typeof(Throttler))]
                 public class ClientSideThrottler : MonoBehaviour
                 {
-                    /// <summary>
-                    ///   The related Throttler.
-                    /// </summary>
-                    public Throttler Throttler { get; private set; }
-                    
-                    /// <summary>
-                    ///   The throttle interval.
-                    /// </summary>
-                    public float Lapse { get { return Throttler.Lapse; } }
-                    
+                    [SerializeField]
+                    private float[] throttleLapses = { 1f };
+
+                    // The throttle time, in ticks.
+                    private ulong[] throttleTimesInTicks;
+
+                    private class ThrottleStatus
+                    {
+                        /// <summary>
+                        ///   The time of the last command sent by the user. This stands
+                        ///   both for a throttled or non-throttled command (this means:
+                        ///   the last command ATTEMPT time is stored here).
+                        /// </summary>
+                        public DateTime LastCommandTime;
+                    }
+
+                    // The throttle status.
+                    private ThrottleStatus[] status;
+
                     protected void Awake()
                     {
-                        Throttler = GetComponent<Throttler>();
+                        if ((throttleLapses?.Length ?? 0) == 0)
+                        {
+                            throttleLapses = new[] { 1f };
+                        }
+
+                        throttleTimesInTicks = new ulong[throttleLapses.Length];
+                        status = new ThrottleStatus[throttleLapses.Length];
+
+                        for (int index = 0; index < throttleLapses.Length; index++)
+                        {
+                            status[index] = new ThrottleStatus();
+                            SetThrottleTime(throttleLapses[index], index);
+                        }
+                    }
+
+                    /// <summary>
+                    ///   Sets the throttle time for a given throttle profile.
+                    /// </summary>
+                    /// <param name="index">The index to set the throttle time to</param>
+                    /// <param name="time">The time to set</param>
+                    public void SetThrottleTime(float time, int index = 0)
+                    {
+                        throttleTimesInTicks[index] = (ulong) Values.Clamp(
+                            0, time * 10000000f, 1000000000000000000
+                        );
+                    }
+
+                    /// <summary>
+                    ///   Gets the throttle time for a given throttle profile.
+                    /// </summary>
+                    /// <param name="index">The index to get the throttle time to</param>
+                    /// <returns>The time</returns>
+                    public float GetThrottleTime(int index = 0)
+                    {
+                        return throttleTimesInTicks[index] / 10000000.0f;
                     }
 
                     /// <summary>
@@ -42,17 +85,18 @@ namespace AlephVault.Unity.Meetgard
                     ///   task result is mandatory.
                     /// </summary>
                     /// <param name="callback">The sender callback</param>
+                    /// <param name="index">The index of the throttling profile to use</param>
                     /// <typeparam name="T">The message type</typeparam>
                     /// <returns>The new, throttled, sender</returns>
-                    public Func<T, Task> MakeThrottledSender<T>(Func<T, Task> callback)
+                    public Func<T, Task> MakeThrottledSender<T>(Func<T, Task> callback, int index = 0)
                     {
                         return (t) =>
                         {
-                            Task result = null;
-                            Throttler.Throttled(() =>
+                            Task result = Task.CompletedTask;
+                            DoThrottled(() =>
                             {
                                 result = callback(t);
-                            });
+                            }, index);
                             return result;
                         };
                     }
@@ -66,18 +110,31 @@ namespace AlephVault.Unity.Meetgard
                     ///   task result is mandatory.
                     /// </summary>
                     /// <param name="callback">The sender callback</param>
+                    /// <param name="index">The index of the throttling profile to use</param>
                     /// <returns>The new, throttled, sender</returns>
-                    public Func<Task> MakeThrottledSender(Func<Task> callback)
+                    public Func<Task> MakeThrottledSender(Func<Task> callback, int index = 0)
                     {
                         return () =>
                         {
-                            Task result = null;
-                            Throttler.Throttled(() =>
+                            Task result = Task.CompletedTask;
+                            DoThrottled(() =>
                             {
                                 result = callback();
-                            });
+                            }, index);
                             return result;
                         };
+                    }
+
+                    // Executes a throttled action.
+                    private void DoThrottled(Action action, int index)
+                    {
+                        DateTime now = DateTime.Now;
+                        DateTime lastCommandTime = status[index].LastCommandTime;
+                        if (now.Subtract(lastCommandTime).Ticks >= GetThrottleTime(index) * 10000000f)
+                        {
+                            status[index].LastCommandTime = now;
+                            action();
+                        }
                     }
                 }
             }
