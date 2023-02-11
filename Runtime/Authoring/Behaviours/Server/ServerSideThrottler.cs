@@ -21,28 +21,14 @@ namespace AlephVault.Unity.Meetgard
                 public class ServerSideThrottler : MonoBehaviour
                 {
                     // The throttle time, in ticks.
-                    private ulong throttleTimeInTicks;
+                    private ulong[] throttleTimesInTicks;
 
                     /// <summary>
                     ///   The command throttle time.
                     /// </summary>
                     [SerializeField]
-                    private float throttleTime = 1f;
+                    private float[] throttleTimes = { 1f };
                     
-                    /// <summary>
-                    ///   The command throttle time.
-                    /// </summary>
-                    public float ThrottleTime
-                    {
-                        get { return throttleTimeInTicks / 10000000; }
-                        set
-                        {
-                            throttleTimeInTicks = (ulong) Values.Clamp(
-                                0, value * 10000000f, 1000000000000000000
-                            );
-                        }
-                    }
-
                     // the consecutive throttle interval, in ticks.
                     private ulong consecutiveThrottleIntervalInTicks;
 
@@ -70,7 +56,15 @@ namespace AlephVault.Unity.Meetgard
 
                     protected void Awake()
                     {
-                        ThrottleTime = throttleTime;
+                        if ((throttleTimes?.Length ?? 0) == 0)
+                        {
+                            throttleTimes = new[] {1f};
+                        }
+                        throttleTimesInTicks = new ulong[throttleTimes.Length];
+                        for (int index = 0; index < throttleTimes.Length; index++)
+                        {
+                            SetThrottleTime(throttleTimes[index], index);
+                        }
                         ConsecutivesThrottleInterval = consecutiveThrottleInterval;
                     }
 
@@ -100,16 +94,43 @@ namespace AlephVault.Unity.Meetgard
                     }
 
                     // This dictionary tracks, for each connection, the throttle settings.
-                    private Dictionary<ulong, ConnectionThrottleStatus> throttles;
+                    private Dictionary<ulong, ConnectionThrottleStatus[]> throttles;
+
+                    /// <summary>
+                    ///   Sets the throttle time for a given throttle profile.
+                    /// </summary>
+                    /// <param name="index">The index to set the throttle time to</param>
+                    /// <param name="time">The time to set</param>
+                    public void SetThrottleTime(float time, int index = 0)
+                    {
+                        throttleTimesInTicks[index] = (ulong) Values.Clamp(
+                            0, time * 10000000f, 1000000000000000000
+                        );
+                    }
+
+                    /// <summary>
+                    ///   Gets the throttle time for a given throttle profile.
+                    /// </summary>
+                    /// <param name="index">The index to get the throttle time to</param>
+                    /// <returns>The time</returns>
+                    public float GetThrottleTime(int index = 0)
+                    {
+                        return throttleTimesInTicks[index] / 10000000.0f;
+                    }
 
                     public void Startup()
                     {
-                        throttles = new Dictionary<ulong, ConnectionThrottleStatus>();
+                        throttles = new Dictionary<ulong, ConnectionThrottleStatus[]>();
                     }
 
                     public void TrackConnection(ulong clientId)
                     {
-                        throttles.Add(clientId, new ConnectionThrottleStatus());
+                        ConnectionThrottleStatus[] statuses = new ConnectionThrottleStatus[throttleTimes.Length];
+                        for (int index = 0; index < statuses.Length; index++)
+                        {
+                            statuses[index] = new ConnectionThrottleStatus();
+                        }
+                        throttles.Add(clientId, statuses);
                     }
 
                     public void UntrackConnection(ulong clientId)
@@ -124,18 +145,20 @@ namespace AlephVault.Unity.Meetgard
                     
                     // Checks whether a command can execute or must be throttled.
                     private async Task<bool> CheckConnectionCommand(
-                        ulong connectionId, Func<ulong, DateTime, int, Task> onCommandThrottled
+                        ulong connectionId, Func<ulong, DateTime, int, Task> onCommandThrottled, int index = 0
                     ) {
+                        float throttleTime = GetThrottleTime(index);
+
                         // Allow everything if the throttle is unset.
-                        if (ThrottleTime <= 0) return true;
+                        if (throttleTime <= 0) return true;
                         
-                        ConnectionThrottleStatus status = throttles[connectionId];
+                        ConnectionThrottleStatus status = throttles[connectionId][index];
                         DateTime now = DateTime.Now;
                         DateTime lastCommandTime = status.LastCommandTime;
 
                         status.LastCommandTime = now;
 
-                        if (now.Subtract(lastCommandTime).Ticks < ThrottleTime * 10000000f)
+                        if (now.Subtract(lastCommandTime).Ticks < throttleTime * 10000000f)
                         {
                             // The first thing is to check whether we apply the
                             // criteria for consecutive throttling interval or
