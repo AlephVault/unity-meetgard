@@ -2,7 +2,6 @@ using AlephVault.Unity.Meetgard.Protocols;
 using AlephVault.Unity.Support.Utils;
 using System;
 using System.Threading.Tasks;
-using UnityEngine;
 
 
 namespace AlephVault.Unity.Meetgard
@@ -36,7 +35,7 @@ namespace AlephVault.Unity.Meetgard
                         AddIncomingMessageHandler("Timeout", async (proto) =>
                         {
                             client.Close();
-                            await (OnTimeout?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnTimeout?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                         });
                     }
 

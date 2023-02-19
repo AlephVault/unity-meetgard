@@ -62,7 +62,7 @@ namespace AlephVault.Unity.Meetgard
                             // This will be invoked after the client repied with MyVersion
                             // message. This means: after the handshake started in client
                             // (protocol-wise) side.
-                            await (OnZeroHandshakeStarted?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnZeroHandshakeStarted?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                             Debug.Log("LetsAgree done");
                         });
                         AddIncomingMessageHandler("Timeout", async (proto) =>
@@ -71,7 +71,7 @@ namespace AlephVault.Unity.Meetgard
                             // or the MyVersion message being sent. This is due to the
                             // client taking too long to respond to LetsAgree message.
                             // Expect a disconnection after this message.
-                            await (OnTimeout?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnTimeout?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                         });
                         AddIncomingMessageHandler("VersionMatch", async (proto) =>
                         {
@@ -80,14 +80,14 @@ namespace AlephVault.Unity.Meetgard
                             // in turn initialize on their own for this client and send
                             // their own messages. But it is available anyway.
                             Ready = true;
-                            await (OnVersionMatch?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnVersionMatch?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                         });
                         AddIncomingMessageHandler("VersionMismatch", async (proto) =>
                         {
                             // This message is received when there is a mismatch between
                             // the server version and the client version. After receiving
                             // this message, expect a sudden graceful disconnection.
-                            await (OnVersionMismatch?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnVersionMismatch?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                         });
                         AddIncomingMessageHandler("NotReady", async (proto) =>
                         {
@@ -95,14 +95,14 @@ namespace AlephVault.Unity.Meetgard
                             // any message other than MyVersion, since the protocols are
                             // not ready for this client (being ready occurs after
                             // agreeing with this zero protocol).
-                            await (OnNotReadyError?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnNotReadyError?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                         });
                         AddIncomingMessageHandler("AlreadyDone", async (proto) =>
                         {
                             // This is a debug message. Typically, it will never occur.
                             // It involved rejecting a MyVersion message because the
                             // handshake is already done. This message is harmless.
-                            await (OnAlreadyDoneError?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnAlreadyDoneError?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                         });
                     }
 

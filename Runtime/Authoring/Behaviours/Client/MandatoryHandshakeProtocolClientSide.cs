@@ -26,7 +26,7 @@ namespace AlephVault.Unity.Meetgard
                             // The OnWelcome event is triggered. The implementation
                             // must, as fast as it can, invoke athe expected method
                             // (i.e. handshake message) in this event handler.
-                            await (OnWelcome?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnWelcome?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                         });
                         AddIncomingMessageHandler("Timeout", async (proto) =>
                         {
@@ -36,7 +36,7 @@ namespace AlephVault.Unity.Meetgard
                             // exists because it is triggered. Expect a disconnection
                             // after this event triggers.
                             client.Close();
-                            await (OnTimeout?.InvokeAsync() ?? Task.CompletedTask);
+                            await (OnTimeout?.InvokeAsync(Tasks.DefaultOnError) ?? Task.CompletedTask);
                         });
                     }
                     
