@@ -88,7 +88,7 @@ namespace AlephVault.Unity.Meetgard
                     public override async Task OnConnected(ulong clientId)
                     {
                         AddHandshakePending(clientId);
-                        _ = SendWelcome(clientId);
+                        await SendWelcome(clientId);
                     }
 
                     /// <summary>
