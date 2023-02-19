@@ -143,7 +143,10 @@ namespace AlephVault.Unity.Meetgard
                                 pendingHandshakeConnections.TryUpdate(pair.Key, pair.Value + delta, pair.Value);
                                 if (pendingHandshakeConnections.TryGetValue(pair.Key, out float value) && value >= handshakeTimeout)
                                 {
-                                    _ = SendTimeout(pair.Key);
+                                    _ = SendTimeout(pair.Key).ContinueWith((task) =>
+                                    {
+                                        server.Close(pair.Key);
+                                    });
                                 }
                             }
                         });
