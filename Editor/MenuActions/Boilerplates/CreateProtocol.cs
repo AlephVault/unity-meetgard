@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using AlephVault.Unity.Boilerplates.Utils;
+using AlephVault.Unity.MenuActions.Types;
 using AlephVault.Unity.MenuActions.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -18,19 +19,23 @@ namespace AlephVault.Unity.Meetgard
                 ///   a name only, and the three files (definition, server and
                 ///   client sides) will be generated out of it.
                 /// </summary>
-                public class CreateProtocolWindow : EditorWindow
+                public class CreateProtocolWindow : SmartEditorWindow
                 {
                     // The base name to use.
                     private Regex baseNameCriterion = new Regex("^[A-Z][A-Za-z0-9_]*$");
                     private string baseName = "MyCustom";
                     
-                    private void OnGUI()
+                    protected override float GetSmartWidth()
+                    {
+                        return 730;
+                    }
+                    
+                    protected override void OnAdjustedGUI()
                     {
                         GUIStyle longLabelStyle = MenuActionUtils.GetSingleLabelStyle();
                         GUIStyle captionLabelStyle = MenuActionUtils.GetCaptionLabelStyle();
                         GUIStyle indentedStyle = MenuActionUtils.GetIndentedStyle();
 
-                        EditorGUILayout.BeginVertical();
                         EditorGUILayout.LabelField("Protocol generation", captionLabelStyle);
                         EditorGUILayout.LabelField(@"
 This utility generates the three protocol files, with boilerplate code and instructions on how to understand that code.
@@ -52,17 +57,13 @@ WARNING: THIS MIGHT OVERRIDE EXISTING CODE. Always use proper source code manage
                         {
                             EditorGUILayout.LabelField("The base name is invalid!", indentedStyle);
                         }
-                        
-                        bool execute = validBaseName && GUILayout.Button("Generate");
-                        EditorGUILayout.EndVertical();
-                        
-                        if (execute) Execute();
+
+                        if (validBaseName) SmartButton("Generate", Execute);
                     }
 
                     private void Execute()
                     {
                         DumpProtocolTemplates(baseName);
-                        Close();
                     }
                 }
 
