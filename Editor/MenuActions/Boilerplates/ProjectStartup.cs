@@ -26,7 +26,7 @@ namespace AlephVault.Unity.Meetgard
                 ///       - Behaviours/: Protocols/, UI/.
                 ///   - Protocols/Messages.
                 /// </summary>
-                [MenuItem("Assets/Create/Meetgard/Boilerplates/Project Startup", false, 201)]
+                [MenuItem("Assets/Create/AlephVault/Meetgard/Boilerplates/Project Startup", false, 201)]
                 public static void ExecuteBoilerplate()
                 {
                     new Boilerplate()
