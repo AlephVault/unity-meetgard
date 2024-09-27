@@ -115,11 +115,20 @@ namespace AlephVault.Unity.Meetgard
                         return throttleTimesInTicks[index] / 10000000.0f;
                     }
 
+                    /// <summary>
+                    ///   Starts all the throttles. Typically, this is invoked when the
+                    ///   server is initializing.
+                    /// </summary>
                     public void Startup()
                     {
                         throttles = new Dictionary<ulong, ConnectionThrottleStatus[]>();
                     }
 
+                    /// <summary>
+                    ///   Starts tracking a connection being throttled. Typically, this
+                    ///   is invoked when a new client connection is established.
+                    /// </summary>
+                    /// <param name="clientId">The id of the connection</param>
                     public void TrackConnection(ulong clientId)
                     {
                         ConnectionThrottleStatus[] statuses = new ConnectionThrottleStatus[throttleTimes.Length];
@@ -130,11 +139,20 @@ namespace AlephVault.Unity.Meetgard
                         throttles.Add(clientId, statuses);
                     }
 
+                    /// <summary>
+                    ///   Stops tracking a connection being throttled. Typically, this
+                    ///   is invoked when a client connection is terminated.
+                    /// </summary>
+                    /// <param name="clientId"></param>
                     public void UntrackConnection(ulong clientId)
                     {
                         throttles.Remove(clientId);
                     }
 
+                    /// <summary>
+                    ///   Clears all the throttles. Typically, this is invoked when the
+                    ///   server is terminated.
+                    /// </summary>
                     public void Teardown()
                     {
                         throttles = null;
