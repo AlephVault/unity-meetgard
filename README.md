@@ -578,7 +578,7 @@ public class BarProtocolServerSide : ProtocolServerSide<Bar>
 
 The `RunInMainThread` utility method runs a callback (which is an asynchronous function or a synchronous one) by queuing it in the related server's `AsyncQueueManager` (defined in `unity-support`), which will have a life-cycle to execute all those queued callbacks in the main thread.
 
-**WARNING**: Do NEVER EVER EVER EVER EVER invoke an `await RunInMainThread(() => {...})` (this means: with the `await` keyword included) inside a callback passed to an outer `RunInMainThread(() => { ... })` call. **NEVER**. By doing that, the code will enter a non-crashing deadlock that will run unnoticed in the code. Ensure the `RunInMainThread` calls are as topmost as needed only, and not inside game logic itself.
+**WARNING**: **Do NEVER EVER EVER EVER EVER** invoke an `await RunInMainThread(() => {...})` (this means: with the `await` keyword included) inside a callback passed to an outer `RunInMainThread(() => { ... })` call. **NEVER**. By doing that, the code will enter a non-crashing deadlock that will run unnoticed in the code. Ensure the `RunInMainThread` calls are as topmost as needed only, and not inside game logic itself.
 
 ## Managing servers and clients
 
@@ -655,3 +655,170 @@ theInSceneClient.Connect("localhost", 2357); // Localhost and same port.
 Client ids are unique and actually a very big pool of numbers. When a server just starts receiving incoming connections, the first client id it will get is `1` and the number will grow. So at first glance is incremental. However, as the connections get closed or dropped, for any reason, the ids are released (and, if the last ids are releases systematically, the server counter may actually decrease and some ids might be reused).
 
 With this in mind, the user must keep that the connection id does not reflect any user authentication of any sort but a transient connection id instead that can be tracked only for gaming purposes (e.g. associating, later, an authenticated session against a connection id).
+
+## Throttling
+
+There are ways to throttle your interactions, in particular if the interactions are costly in execution. This includes innocent errors or malicious DDoS / LOIC payloads.
+
+For this, a server might have a `ServerSideThrottler` attached to it (to filter out malicious calls from the clients).
+Also, the client might have a `ClientSideThrottler` attached to it (to locally prevent malicious sends to the server).
+
+### Client-side throttling
+
+Client-side throttling can be understood in terms of a prior but not mandatory check on the client side to a priori ensure they don't flood malicious commands.
+However, since this is client-side, it's not the _ground truth_ throttling.
+
+In order to implement client-side throttling, ensure your desired protocol client side makes use of ClientSideThrottler:
+
+1. Add the client-side throttler.
+2. Refer it on Setup.
+3. Throttle your code.
+
+Adding the throttler involves adding a component:
+
+```
+using UnityEngine;
+using AlephVault.Unity.Meetgard.Authoring.Behaviours.Client;
+
+[RequireComponent(typeof(ClientSideThrottler))]
+public class BarProtocolClientSide : ProtocolClientSide<Bar>  
+{
+}
+```
+
+Then, refer it on Setup:
+
+```
+...
+
+[RequireComponent(typeof(ClientSideThrottler))]
+public class BarProtocolClientSide : ProtocolClientSide<Bar>  
+{
+    ...
+
+    private ClientSideThrottler throttler;
+    
+    protected override void Setup()  
+    {
+        throttler = GetComponent<ClientSideThrottler>();
+    }
+
+    ...
+}
+```
+
+With this done, the `ClientSideThrottler` will be configurable in the client object. It has means to configure the available intervals (lapses) and it has at least 1 element (lapse 0) of 1 second.
+An arbitrary amount of lapses can be configured that way, and they can be referred by their index (0 to N-1). Typically, they will be _stricter_ than the corresponding server-side throttles.
+
+Making use of the throttle mechanism can be done like this over one of those methods.
+
+```
+...
+
+[RequireComponent(typeof(ClientSideThrottler))]
+public class BarProtocolClientSide : ProtocolClientSide<Bar>  
+{
+    ...
+
+    // We modify the initialization code to wrap the
+    // command senders in this throttle technology.
+    protected override void Initialize()  
+    {
+        // Throttler for void senders.
+        // The `0` corresponds to use the 0th throttler. It's optional (assumed 0 by default) and must stand for one of the defined lapses' indices.
+        SendMyMessageName = throttler.MakeThrottledSender(MakeSender("MyMessageName"), 0);
+        // Throttler for typed senders.
+        SendMyOtherMessageName = throttler.MakeThrottledSender(MakeSender<MyClientPayload>("MyOtherMessageName"));
+	}
+	
+    ...
+}
+```
+
+Now, making use of `SendMyMessageName` and `SendMyMessageName` will only succeed after the intervals elapsed after the last call over that lapse index. "Too quick" calls will silently fail / be ignored.
+In this example, calling either function will have to wait after calling either function (since both use index `[0]` in those calls) and waiting for the lapse.
+
+Also, there are cases where users might want to change lapses (not adding / removing, but only changing):
+
+```
+throttler.SetThrottleTime(time[, index = 0]);
+float time = throttler.GetThrottleTime([index = 0]);
+```
+
+Where the time is expressed in seconds, and the default index to affect/get is 0 if not specified.
+
+### Server-side throttling
+
+Contrary to the client side, the server-side throttle is the ground truth. Instead of configuring senders, the _handlers_ are throttled.
+
+The first thing, similar to the clients, is to add the component to the server object, reference it and configure it:
+
+```
+using UnityEngine;
+using AlephVault.Unity.Meetgard.Authoring.Behaviours.Server;
+
+[RequireComponent(typeof(ServerSideThrottler))]
+public class BarProtocolServerSide : ProtocolServerSide<Bar>  
+{
+    ...
+    
+    private ServerSideThrottler throttler;
+    
+    protected override void Setup()  
+    {
+        throttler = GetComponent<ServerSideThrottler>(); 
+    }
+    
+    ...
+
+    protected override void SetIncomingMessageHandlers()  
+    {
+        AddIncomingMessageHandler(
+            "MyMessageName", async (proto, clientId) => {
+                // Invoke the throttling over index 0 (by default)
+                // and the given connectionId.
+                await throttler.DoThrottled(clientId, async () => {
+                    ... perhaps do something which is not Main-Thread required ...
+                    await RunInMainThread(async () => {
+                        ... do Main-Thread required code here...
+                    });
+                    ... perhaps do something which is not Main-Thread required ...
+                });
+            }
+        );
+        AddIncomingMessageHandler<MyClientPayload>(
+            "MyOtherMessageName", async (proto, clientId, message) => {
+                // Invoke the throttling over index 0 (specified)
+                // and the given connectionId. Also, custom logic
+                // for when the command was throttled (it can be
+                // null to perform no logic at all).
+                await throttler.DoThrottled(clientId, async () => {
+                    ... perhaps do something which is not Main-Thread required ...
+                    await RunInMainThread(async () => {
+                        ... do Main-Thread required code here...
+                    });
+                    ... perhaps do something which is not Main-Thread required ...
+                }, async (clientId, now, count) => {
+                    // `clientId` is ulong.
+                    // `now` is DateTime.
+                    // `count` is int. The number of previous consecutive throttles. 
+                    ...something here to process the throttle and prev. count...
+                }, 0);
+            }
+        );        
+    }
+    
+    ...
+}
+```
+
+Both handlers, in this case, pay attention to the current clientId and the constant index 0 (one by default, the other explicitly).
+
+Also, aside from setting the lapses (more than one can be set) via editor, two methods exist to change them by code:
+
+```
+throttler.SetThrottleTime(time[, index = 0]);
+float time = throttler.GetThrottleTime([index = 0]);
+```
+
+(Yes: the signatures are the same as in `ClientSideThrottler`).
