@@ -822,3 +822,26 @@ float time = throttler.GetThrottleTime([index = 0]);
 ```
 
 (Yes: the signatures are the same as in `ClientSideThrottler`).
+
+## Versioning
+
+Games and applications evolve over time, and it's not weird that attempted connections happen to have mismatching protocols.
+
+The `ZeroProtocol` on both sides (client and server) must define a version in all their 4 fields: Major, Minor, Revision and Release Type.
+
+As of today, the version match is exact: If the attempting client does not have a version _exactly matching_ what the server has configured, the connection is rejected. _In a future, that version match might not be THAT exact_.
+
+The `ZeroProtocolClientSide` offers a set of events that can be listened to:
+
+1. `public event Func<Task> OnZeroHandshakeStarted`: Triggered when the server issued a handshake to the client. Also, the client will start the version handshake.
+2. `public event Func<Task> OnVersionMatch`: Triggered when the server decided that there's a version match and the connection will continue.
+3. `public event Func<Task> OnVersionMismatch`: Triggered when the server decided that there's a version mismatch. The connection will also terminate from the server side. The client side must also close its connection (_in a future version, this will be done automatically_).
+4. `public event Func<Task> OnTimeout`: Triggered when the server decided there was a timeout: the server did not receive the version handshake from the client. The connection will also terminete from the server side. The client side must also close its connection (_in a future version, this will be done automatically_).
+5. `public event Func<Task> OnNotReadyError`: Triggered when the server decided the command cannot be processed since the version handshake was not done first.
+6. `public event Func<Task> OnAlreadyDoneError`: Triggered when the server decided the version handshake was already done, and it's not needed again.
+
+## Extra types
+
+### `Nothing` type
+
+There's a dummy type which does not hold any data. It's called `Nothing` (implementing `unity-binary`'s `ISerializable` interface). Its serialization and de-serialization will do nothing.
