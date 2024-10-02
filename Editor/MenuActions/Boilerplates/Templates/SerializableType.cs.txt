@@ -1,0 +1,20 @@
+namespace Protocols.Messages
+{
+    using AlephVault.Unity.Binary;
+
+    public class #SCRIPTNAME# : ISerializable
+    {
+        // Declare members (public, in general) like this:
+        //
+        // public int myInt;
+        // public string myString;
+    
+        public void Serialize(Serializer serializer)
+        {
+            // And serialize them (this works both when reading and writing) like this:
+            //
+            // serializer.Serialize(ref myInt);
+            // serializer.Serialize(ref myString);
+        }
+    }
+}
