@@ -162,6 +162,11 @@ namespace AlephVault.Unity.Meetgard
                     private async Task<bool> CheckConnectionCommand(
                         ulong connectionId, Func<ulong, DateTime, int, Task> onCommandThrottled, int index = 0
                     ) {
+                        if (throttles == null)
+                        {
+                            throw new InvalidOperationException("This throttler is not initialized - Invoke Startup() first");
+                        }
+
                         float throttleTime = GetThrottleTime(index);
 
                         // Allow everything if the throttle is unset.
