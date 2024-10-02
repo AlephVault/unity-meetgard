@@ -303,26 +303,39 @@ namespace AlephVault.Unity.Meetgard
                     /// <returns>A task to wait for</returns>
                     public Task RunInMainThread(Action action)
                     {
+                        if (client.QueueManager.CurrentThreadIsMain)
+                        {
+                            action();
+                            return Task.CompletedTask;
+                        }
                         return client.QueueManager.Queue(action);
                     }
 
                     /// <summary>
                     ///   Runs an async action in the main unity thread.
                     /// </summary>
-                    /// <param name="action">The action to run</param>
+                    /// <param name="task">The action to run</param>
                     /// <returns>A task to wait for</returns>
                     public Task RunInMainThread(Func<Task> task)
                     {
+                        if (client.QueueManager.CurrentThreadIsMain)
+                        {
+                            return task();
+                        }
                         return client.QueueManager.Queue(task);
                     }
 
                     /// <summary>
                     ///   Runs a typed async action in the main unity thread.
                     /// </summary>
-                    /// <param name="action">The typed action to run</param>
+                    /// <param name="task">The typed action to run</param>
                     /// <returns>A typed task to wait for</returns>
                     public Task<T> RunInMainThread<T>(Func<Task<T>> task)
                     {
+                        if (client.QueueManager.CurrentThreadIsMain)
+                        {
+                            return task();
+                        }
                         return client.QueueManager.Queue(task);
                     }
 

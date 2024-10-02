@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace AlephVault.Unity.Meetgard
 {
@@ -402,26 +403,39 @@ namespace AlephVault.Unity.Meetgard
                     /// <returns>A task to wait for</returns>
                     public Task RunInMainThread(Action action)
                     {
+                        if (server.QueueManager.CurrentThreadIsMain)
+                        {
+                            action();
+                            return Task.CompletedTask;
+                        }
                         return server.QueueManager.Queue(action);
                     }
 
                     /// <summary>
                     ///   Runs an async action in the main unity thread.
                     /// </summary>
-                    /// <param name="action">The action to run</param>
+                    /// <param name="task">The action to run</param>
                     /// <returns>A task to wait for</returns>
                     public Task RunInMainThread(Func<Task> task)
                     {
+                        if (server.QueueManager.CurrentThreadIsMain)
+                        {
+                            return task();
+                        }
                         return server.QueueManager.Queue(task);
                     }
 
                     /// <summary>
                     ///   Runs a typed async action in the main unity thread.
                     /// </summary>
-                    /// <param name="action">The typed action to run</param>
+                    /// <param name="task">The typed action to run</param>
                     /// <returns>A typed task to wait for</returns>
                     public Task<T> RunInMainThread<T>(Func<Task<T>> task)
                     {
+                        if (server.QueueManager.CurrentThreadIsMain)
+                        {
+                            return task();
+                        }
                         return server.QueueManager.Queue(task);
                     }
 
