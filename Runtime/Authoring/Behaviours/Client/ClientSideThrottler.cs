@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using AlephVault.Unity.Meetgard.Protocols;
-using AlephVault.Unity.Support.Authoring.Behaviours;
 using AlephVault.Unity.Support.Utils;
 using UnityEngine;
+using Exception = AlephVault.Unity.Meetgard.Types.Exception;
 
 namespace AlephVault.Unity.Meetgard
 {
@@ -18,6 +17,14 @@ namespace AlephVault.Unity.Meetgard
                 /// </summary>
                 public class ClientSideThrottler : MonoBehaviour
                 {
+                    /// <summary>
+                    ///   Exception being thrown when a sender with throwOnThrottled=true was throttled.
+                    /// </summary>
+                    public class ThrottledException : Exception
+                    {
+                        public ThrottledException(string message) : base(message) { }
+                    }
+                    
                     [SerializeField]
                     private float[] throttleLapses = { 1f };
 
@@ -86,9 +93,10 @@ namespace AlephVault.Unity.Meetgard
                     /// </summary>
                     /// <param name="callback">The sender callback</param>
                     /// <param name="index">The index of the throttling profile to use</param>
+                    /// <param name="throwOnThrottled">If true, then when the command is throttled an exception is raised (and a task is NOT returned)</param>
                     /// <typeparam name="T">The message type</typeparam>
                     /// <returns>The new, throttled, sender</returns>
-                    public Func<T, Task> MakeThrottledSender<T>(Func<T, Task> callback, int index = 0)
+                    public Func<T, Task> MakeThrottledSender<T>(Func<T, Task> callback, int index = 0, bool throwOnThrottled = false)
                     {
                         return (t) =>
                         {
@@ -96,7 +104,7 @@ namespace AlephVault.Unity.Meetgard
                             DoThrottled(() =>
                             {
                                 result = callback(t);
-                            }, index);
+                            }, index, throwOnThrottled);
                             return result;
                         };
                     }
@@ -126,7 +134,7 @@ namespace AlephVault.Unity.Meetgard
                     }
 
                     // Executes a throttled action.
-                    private void DoThrottled(Action action, int index)
+                    private void DoThrottled(Action action, int index, bool throwOnThrottled = false)
                     {
                         DateTime now = DateTime.Now;
                         DateTime lastCommandTime = status[index].LastCommandTime;
@@ -134,6 +142,10 @@ namespace AlephVault.Unity.Meetgard
                         {
                             status[index].LastCommandTime = now;
                             action();
+                        }
+                        else if (throwOnThrottled)
+                        {
+                            throw new ThrottledException("The command was throttled");
                         }
                     }
                 }
