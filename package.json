@@ -1,6 +1,6 @@
 {
   "name": "com.alephvault.unity.meetgard",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "displayName": "Aleph Vault - Unity - Meetgard",
   "description": "A brand-new TCP setup for networked games.",
   "unity": "2020.1",
